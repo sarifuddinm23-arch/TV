@@ -3,19 +3,30 @@ var GeminiOS = {
     isPlaying: false,
 
     initPlayer: function(elementId) {
+        console.log("Initializing Player...");
         this.player = new YT.Player(elementId, {
             height: '100%',
             width: '100%',
-            playerVars: { 'autoplay': 1, 'controls': 1, 'rel': 0, 'enablejsapi': 1 },
+            playerVars: { 
+                'autoplay': 1, 
+                'controls': 1, 
+                'rel': 0, 
+                'enablejsapi': 1,
+                'origin': window.location.origin
+            },
             events: {
+                'onReady': () => { console.log("Player is Ready!"); },
                 'onStateChange': (e) => { this.isPlaying = (e.data == 1); }
             }
         });
     },
 
     executeCommand: function(cmd) {
-        if (!this.player) return;
-        console.log("Executing:", cmd);
+        // প্লেয়ার রেডি না থাকলে কমান্ড কাজ করবে না
+        if (!this.player || typeof this.player.loadVideoById !== 'function') {
+            console.warn("Player not ready for command:", cmd);
+            return;
+        }
 
         switch(cmd) {
             case 'Enter': 
@@ -42,7 +53,12 @@ var GeminiOS = {
     },
 
     loadVideo: function(videoId) {
-        document.getElementById('video-overlay').style.display = 'block';
-        this.player.loadVideoById(videoId);
+        // প্লেয়ার রেডি আছে কি না চেক করা (Safety Check)
+        if (this.player && typeof this.player.loadVideoById === 'function') {
+            document.getElementById('video-overlay').style.display = 'block';
+            this.player.loadVideoById(videoId);
+        } else {
+            alert("YouTube Player is still loading... please wait a second.");
+        }
     }
 };
