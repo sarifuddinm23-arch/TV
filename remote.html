@@ -2,32 +2,179 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>TV Remote</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gemini Smart Remote</title>
     <style>
-        body { display: flex; justify-content: center; align-items: center; height: 100vh; background: #222; }
-        .remote { background: #333; padding: 20px; border-radius: 30px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-        button { padding: 20px; font-size: 1.2rem; cursor: pointer; border-radius: 10px; border: none; background: #444; color: white; }
-        button:active { background: #666; }
-        .power { background: #e74c3c; grid-column: span 2; }
+        :root {
+            --remote-bg: #1a1a1a;
+            --btn-bg: #333;
+            --accent: #4285f4;
+            --danger: #e74c3c;
+        }
+
+        body {
+            background: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        /* রিমোটের বডি */
+        .remote-body {
+            width: 150px;
+            background: var(--remote-bg);
+            padding: 30px 20px;
+            border-radius: 50px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        /* পাওয়ার এবং ভয়েস বাটন */
+        .top-row {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        .btn-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            transition: 0.2s;
+        }
+
+        .power { background: var(--danger); }
+        .voice { 
+            background: white; 
+            color: var(--accent); 
+            box-shadow: 0 0 10px rgba(66, 133, 244, 0.5);
+            width: 50px; height: 50px;
+        }
+
+        /* D-Pad / Navigation Wheel */
+        .d-pad {
+            width: 120px;
+            height: 120px;
+            background: #222;
+            border-radius: 50%;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .nav-btn {
+            position: absolute;
+            background: transparent;
+            border: none;
+            color: #888;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .up { top: 10px; }
+        .down { bottom: 10px; }
+        .left { left: 10px; }
+        .right { right: 10px; }
+
+        .ok-btn {
+            width: 50px;
+            height: 50px;
+            background: #333;
+            border-radius: 50%;
+            border: 2px solid #444;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* নিচের বাটনগুলো */
+        .btn-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            width: 100%;
+        }
+
+        .small-btn {
+            background: var(--btn-bg);
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 10px;
+            font-size: 11px;
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+
+        .app-btn {
+            background: white;
+            color: black;
+            font-weight: bold;
+            height: 35px;
+            border-radius: 5px;
+        }
+
+        .netflix { color: #e50914; }
+        .youtube { color: #ff0000; }
+
+        button:active { transform: scale(0.9); opacity: 0.8; }
     </style>
 </head>
 <body>
 
-    <div class="remote">
-        <button class="power" onclick="sendCommand('power')">POWER</button>
-        <button onclick="sendCommand('Channel 1')">CH 1</button>
-        <button onclick="sendCommand('Channel 2')">CH 2</button>
-        <button onclick="sendCommand('Netflix')">Netflix</button>
-        <button onclick="sendCommand('YouTube')">YouTube</button>
+    <div class="remote-body">
+        <div class="top-row">
+            <button class="btn-circle power" onclick="sendCommand('power')">⏻</button>
+            <button class="btn-circle voice" onclick="startVoice()">🎤</button>
+        </div>
+
+        <div class="d-pad">
+            <button class="nav-btn up" onclick="sendCommand('Up')">▲</button>
+            <button class="nav-btn down" onclick="sendCommand('Down')">▼</button>
+            <button class="nav-btn left" onclick="sendCommand('Left')">◀</button>
+            <button class="nav-btn right" onclick="sendCommand('Right')">▶</button>
+            <button class="ok-btn" onclick="sendCommand('Enter')">OK</button>
+        </div>
+
+        <div class="btn-grid">
+            <button class="small-btn" onclick="sendCommand('Back')">Back</button>
+            <button class="small-btn" onclick="sendCommand('Home')">Home</button>
+        </div>
+
+        <div class="btn-grid">
+            <button class="small-btn app-btn netflix" onclick="sendCommand('Netflix')">NETFLIX</button>
+            <button class="small-btn app-btn youtube" onclick="sendCommand('YouTube')">YouTube</button>
+        </div>
     </div>
 
     <script>
         function sendCommand(cmd) {
-            // localStorage এ ডাটা সেভ করা (এটি অন্য ট্যাবে সিগন্যাল পাঠাবে)
             localStorage.setItem('tv_command', cmd);
-            
-            // একই ভ্যালু বারবার পাঠাতে চাইলে রিসেট করে নিতে হয়
-            setTimeout(() => localStorage.removeItem('tv_command'), 100);
+            // ভ্যালু রিসেট করা যাতে একই কমান্ড বারবার কাজ করে
+            setTimeout(() => {
+                localStorage.removeItem('tv_command');
+            }, 50);
+        }
+
+        // সিম্পল ভয়েস রিকগনিশন (অপশনাল)
+        function startVoice() {
+            alert("Listening... (Say 'Play YouTube' or 'Go Back')");
+            // এখানে Web Speech API যোগ করা সম্ভব
         }
     </script>
 </body>
