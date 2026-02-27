@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>TV Remote</title>
+    <style>
+        body { display: flex; justify-content: center; align-items: center; height: 100vh; background: #222; }
+        .remote { background: #333; padding: 20px; border-radius: 30px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        button { padding: 20px; font-size: 1.2rem; cursor: pointer; border-radius: 10px; border: none; background: #444; color: white; }
+        button:active { background: #666; }
+        .power { background: #e74c3c; grid-column: span 2; }
+    </style>
+</head>
+<body>
+
+    <div class="remote">
+        <button class="power" onclick="sendCommand('power')">POWER</button>
+        <button onclick="sendCommand('Channel 1')">CH 1</button>
+        <button onclick="sendCommand('Channel 2')">CH 2</button>
+        <button onclick="sendCommand('Netflix')">Netflix</button>
+        <button onclick="sendCommand('YouTube')">YouTube</button>
+    </div>
+
+    <script>
+        function sendCommand(cmd) {
+            // localStorage এ ডাটা সেভ করা (এটি অন্য ট্যাবে সিগন্যাল পাঠাবে)
+            localStorage.setItem('tv_command', cmd);
+            
+            // একই ভ্যালু বারবার পাঠাতে চাইলে রিসেট করে নিতে হয়
+            setTimeout(() => localStorage.removeItem('tv_command'), 100);
+        }
+    </script>
+</body>
+</html>
