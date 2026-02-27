@@ -3,178 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gemini Smart Remote</title>
+    <title>Gemini Remote | Full Control</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <style>
-        :root {
-            --remote-bg: #1a1a1a;
-            --btn-bg: #333;
-            --accent: #4285f4;
-            --danger: #e74c3c;
-        }
+        body { background: #000; color: white; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .remote { width: 180px; background: #1a1a1a; padding: 40px 20px; border-radius: 50px; border: 2px solid #333; display: flex; flex-direction: column; align-items: center; gap: 20px; }
+        
+        .d-pad { width: 140px; height: 140px; background: #252525; border-radius: 50%; position: relative; }
+        .btn { position: absolute; background: #333; border: none; color: white; border-radius: 10px; cursor: pointer; padding: 10px; }
+        .btn:active { background: #4285f4; }
 
-        body {
-            background: #f0f0f0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            font-family: 'Segoe UI', sans-serif;
-        }
+        /* D-Pad Layout */
+        .up { top: 5px; left: 50%; transform: translateX(-50%); width: 40px; }
+        .down { bottom: 5px; left: 50%; transform: translateX(-50%); width: 40px; }
+        .left { left: 5px; top: 50%; transform: translateY(-50%); height: 40px; }
+        .right { right: 5px; top: 50%; transform: translateY(-50%); height: 40px; }
+        .ok { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 50px; height: 50px; border-radius: 50%; background: #444; font-weight: bold; }
 
-        /* রিমোটের বডি */
-        .remote-body {
-            width: 150px;
-            background: var(--remote-bg);
-            padding: 30px 20px;
-            border-radius: 50px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 20px;
-        }
-
-        /* পাওয়ার এবং ভয়েস বাটন */
-        .top-row {
-            display: flex;
-            justify-content: space-between;
-            width: 100%;
-        }
-
-        .btn-circle {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            border: none;
-            color: white;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            transition: 0.2s;
-        }
-
-        .power { background: var(--danger); }
-        .voice { 
-            background: white; 
-            color: var(--accent); 
-            box-shadow: 0 0 10px rgba(66, 133, 244, 0.5);
-            width: 50px; height: 50px;
-        }
-
-        /* D-Pad / Navigation Wheel */
-        .d-pad {
-            width: 120px;
-            height: 120px;
-            background: #222;
-            border-radius: 50%;
-            position: relative;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .nav-btn {
-            position: absolute;
-            background: transparent;
-            border: none;
-            color: #888;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 16px;
-        }
-
-        .up { top: 10px; }
-        .down { bottom: 10px; }
-        .left { left: 10px; }
-        .right { right: 10px; }
-
-        .ok-btn {
-            width: 50px;
-            height: 50px;
-            background: #333;
-            border-radius: 50%;
-            border: 2px solid #444;
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        /* নিচের বাটনগুলো */
-        .btn-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            width: 100%;
-        }
-
-        .small-btn {
-            background: var(--btn-bg);
-            color: white;
-            border: none;
-            padding: 10px;
-            border-radius: 10px;
-            font-size: 11px;
-            text-transform: uppercase;
-            cursor: pointer;
-        }
-
-        .app-btn {
-            background: white;
-            color: black;
-            font-weight: bold;
-            height: 35px;
-            border-radius: 5px;
-        }
-
-        .netflix { color: #e50914; }
-        .youtube { color: #ff0000; }
-
-        button:active { transform: scale(0.9); opacity: 0.8; }
+        .extra-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; }
+        .small-btn { background: #333; color: white; border: none; padding: 15px; border-radius: 15px; cursor: pointer; font-size: 12px; }
+        .small-btn:active { background: #e74c3c; }
+        .youtube { background: white; color: red; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <div class="remote-body">
-        <div class="top-row">
-            <button class="btn-circle power" onclick="sendCommand('power')">⏻</button>
-            <button class="btn-circle voice" onclick="startVoice()">🎤</button>
-        </div>
-
+    <div class="remote">
+        <h3 style="margin:0; font-size:14px; color:#666;">GEMINI REMOTE</h3>
+        
         <div class="d-pad">
-            <button class="nav-btn up" onclick="sendCommand('Up')">▲</button>
-            <button class="nav-btn down" onclick="sendCommand('Down')">▼</button>
-            <button class="nav-btn left" onclick="sendCommand('Left')">◀</button>
-            <button class="nav-btn right" onclick="sendCommand('Right')">▶</button>
-            <button class="ok-btn" onclick="sendCommand('Enter')">OK</button>
+            <button class="btn up" onclick="send('ArrowUp')">▲</button>
+            <button class="btn down" onclick="send('ArrowDown')">▼</button>
+            <button class="btn left" onclick="send('ArrowLeft')">◀</button>
+            <button class="btn right" onclick="send('ArrowRight')">▶</button>
+            <button class="btn ok" onclick="send('Enter')">OK</button>
         </div>
 
-        <div class="btn-grid">
-            <button class="small-btn" onclick="sendCommand('Back')">Back</button>
-            <button class="small-btn" onclick="sendCommand('Home')">Home</button>
+        <div class="extra-btns">
+            <button class="small-btn" onclick="send('Backspace')">BACK</button>
+            <button class="small-btn" onclick="send('Home')">HOME</button>
         </div>
 
-        <div class="btn-grid">
-            <button class="small-btn app-btn netflix" onclick="sendCommand('Netflix')">NETFLIX</button>
-            <button class="small-btn app-btn youtube" onclick="sendCommand('YouTube')">YouTube</button>
+        <div class="extra-btns">
+            <button class="small-btn youtube" onclick="send('YouTube_Direct')">YouTube</button>
+            <button class="small-btn" onclick="send('Mute')">MUTE</button>
         </div>
     </div>
 
     <script>
-        function sendCommand(cmd) {
-            localStorage.setItem('tv_command', cmd);
-            // ভ্যালু রিসেট করা যাতে একই কমান্ড বারবার কাজ করে
-            setTimeout(() => {
-                localStorage.removeItem('tv_command');
-            }, 50);
-        }
+        // আপনার Firebase Config এখানে বসান
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            databaseURL: "YOUR_DATABASE_URL",
+            projectId: "YOUR_PROJECT_ID"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database().ref('tv_command');
 
-        // সিম্পল ভয়েস রিকগনিশন (অপশনাল)
-        function startVoice() {
-            alert("Listening... (Say 'Play YouTube' or 'Go Back')");
-            // এখানে Web Speech API যোগ করা সম্ভব
+        function send(cmd) {
+            db.set(cmd);
+            console.log("Command Sent: " + cmd);
         }
     </script>
 </body>
