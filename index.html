@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gemini OS | Premium TV Interface</title>
+    <title>Gemini OS | YouTube TV Mode</title>
     <style>
         :root {
             --bg-color: #050505;
@@ -20,14 +20,12 @@
             overflow: hidden;
         }
 
-        /* Background Design */
         .bg-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: radial-gradient(circle at 20% 30%, #1a1a1a 0%, #050505 100%);
             z-index: -1;
         }
 
-        /* Navbar */
         .navbar {
             display: flex; justify-content: space-between; align-items: center;
             padding: 30px 60px;
@@ -39,14 +37,12 @@
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
 
-        .clock { font-size: 24px; opacity: 0.8; font-weight: 300; }
+        .clock { font-size: 24px; opacity: 0.8; }
 
-        /* Main Content */
         .content { padding: 0 60px; }
         .greeting { font-size: 1.2rem; opacity: 0.6; margin-bottom: 5px; }
         .featured-title { font-size: 2.5rem; margin-bottom: 30px; font-weight: bold; }
 
-        /* App Grid Scrollable */
         .app-grid {
             display: flex; gap: 30px;
             overflow-x: hidden; padding: 25px 0;
@@ -54,7 +50,6 @@
             scroll-behavior: smooth;
         }
 
-        /* App Cards */
         .app-card {
             min-width: 240px; height: 150px;
             position: relative; background: #1c1c1e;
@@ -75,10 +70,8 @@
         .app-logo {
             width: 70%; height: auto; max-height: 80%;
             object-fit: contain; pointer-events: none;
-            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.5));
         }
 
-        /* Video Player Overlay */
         #video-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: #000; display: none; z-index: 1000;
@@ -91,8 +84,6 @@
             z-index: 1001; cursor: pointer; border: 1px solid rgba(255,255,255,0.3);
             font-weight: bold; backdrop-filter: blur(10px);
         }
-
-        .back-btn:hover { background: rgba(255,255,255,0.4); }
     </style>
 </head>
 <body>
@@ -106,7 +97,7 @@
 
     <div class="content">
         <div class="greeting" id="greeting-text">Welcome Back</div>
-        <div class="featured-title">Featured OTT & Apps</div>
+        <div class="featured-title">Smart TV Hub</div>
 
         <div class="app-grid" id="app-grid">
             <div class="app-card active" id="card-1" onclick="selectAndOpen(1)">
@@ -147,104 +138,75 @@
         let activeIdx = 1;
         const totalCards = 8;
         
-        // Video Database
         const videoData = {
-            1: 'jfKfPfyJRdk', // YouTube
-            2: '3JZ_D3ELwOQ', // Netflix
-            3: 'I2mU-C4Ighw', // Hotstar
-            4: 'dQw4w9WgXcQ', // MX Player
-            5: '5qap5aO4i9A', // Zee5
-            6: 'M7lc1UVf-VE', // SonyLIV
-            7: '98WtmW-ljcE', // JioCinema
-            8: 'K4TOrB7at0Y'  // Prime
+            2: '3JZ_D3ELwOQ', 3: 'I2mU-C4Ighw', 4: 'dQw4w9WgXcQ',
+            5: '5qap5aO4i9A', 6: 'M7lc1UVf-VE', 7: '98WtmW-ljcE', 8: 'K4TOrB7at0Y'
         };
 
-        // Initialize YouTube
         function onYouTubeIframeAPIReady() {
             player = new YT.Player('yt-player', {
                 height: '100%', width: '100%',
-                playerVars: { 'autoplay': 1, 'controls': 1, 'rel': 0, 'showinfo': 0 }
+                playerVars: { 'autoplay': 1, 'controls': 1 }
             });
         }
 
-        // --- CONTROLS LOGIC ---
-
-        // 1. Keyboard Controls
-        document.addEventListener('keydown', (e) => {
-            if (e.key === "ArrowRight") navigate(1);
-            if (e.key === "ArrowLeft") navigate(-1);
-            if (e.key === "Enter") openApp();
-            if (e.key === "Backspace" || e.key === "Escape") closeApp();
-        });
-
-        // 2. Mouse Click Controls
+        // কন্ট্রোল ফাংশন
         function selectAndOpen(idx) {
             activeIdx = idx;
             updateUI();
-            setTimeout(openApp, 100); // Small delay for visual effect
+            setTimeout(openApp, 100);
         }
 
-        // 3. Remote/Storage Controls (For local testing on same browser)
-        window.addEventListener('storage', (e) => {
-            if (e.key === 'tv_command') {
-                const cmd = e.newValue;
-                if (!cmd) return;
-                if (cmd === 'Right') navigate(1);
-                if (cmd === 'Left') navigate(-1);
-                if (cmd === 'Enter') openApp();
-                if (cmd === 'Back' || cmd === 'Home') closeApp();
-                if (cmd === 'Netflix') { activeIdx = 2; updateUI(); openApp(); }
-                if (cmd === 'YouTube') { activeIdx = 1; updateUI(); openApp(); }
+        function openApp() {
+            if (activeIdx === 1) {
+                // ইউটিউব টিভি মোডে ওপেন হবে
+                window.location.href = "https://www.youtube.com/tv";
+            } else {
+                const vId = videoData[activeIdx];
+                document.getElementById('video-overlay').style.display = 'block';
+                if (player && player.loadVideoById) player.loadVideoById(vId);
             }
-        });
+        }
 
-        function navigate(direction) {
-            activeIdx += direction;
+        function closeApp() {
+            document.getElementById('video-overlay').style.display = 'none';
+            if (player && player.stopVideo) player.stopVideo();
+        }
+
+        function navigate(dir) {
+            activeIdx += dir;
             if (activeIdx > totalCards) activeIdx = 1;
             if (activeIdx < 1) activeIdx = totalCards;
             updateUI();
         }
 
         function updateUI() {
-            // Update Active Class
-            document.querySelectorAll('.app-card').forEach(card => card.classList.remove('active'));
+            document.querySelectorAll('.app-card').forEach(c => c.classList.remove('active'));
             document.getElementById('card-' + activeIdx).classList.add('active');
-            
-            // Smooth Scroll to Center the Active Card
             const grid = document.getElementById('app-grid');
-            const cardWidth = 270; // Width + Gap
-            const scrollPos = (activeIdx - 1) * cardWidth - (window.innerWidth / 4);
-            grid.scrollTo({ left: scrollPos, behavior: 'smooth' });
+            grid.scrollTo({ left: (activeIdx - 1) * 270 - 100, behavior: 'smooth' });
         }
 
-        function openApp() {
-            const vId = videoData[activeIdx];
-            document.getElementById('video-overlay').style.display = 'block';
-            if (player && player.loadVideoById) {
-                player.loadVideoById(vId);
+        document.addEventListener('keydown', (e) => {
+            if (e.key === "ArrowRight") navigate(1);
+            if (e.key === "ArrowLeft") navigate(-1);
+            if (e.key === "Enter") openApp();
+            if (e.key === "Backspace") closeApp();
+        });
+
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'tv_command') {
+                const cmd = e.newValue;
+                if (cmd === 'Right') navigate(1);
+                if (cmd === 'Left') navigate(-1);
+                if (cmd === 'Enter') openApp();
+                if (cmd === 'Back') closeApp();
             }
-        }
+        });
 
-        function closeApp() {
-            document.getElementById('video-overlay').style.display = 'none';
-            if (player && player.stopVideo) {
-                player.stopVideo();
-            }
-        }
-
-        // Clock & Greeting
-        function updateClock() {
-            const now = new Date();
-            document.getElementById('time').innerText = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-            
-            const hrs = now.getHours();
-            let g = "Good Evening";
-            if (hrs < 12) g = "Good Morning";
-            else if (hrs < 17) g = "Good Afternoon";
-            document.getElementById('greeting-text').innerText = g;
-        }
-        setInterval(updateClock, 1000);
-        updateClock();
+        setInterval(() => {
+            document.getElementById('time').innerText = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        }, 1000);
     </script>
 </body>
 </html>
