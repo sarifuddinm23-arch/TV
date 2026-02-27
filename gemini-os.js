@@ -1,9 +1,11 @@
 var GeminiOS = {
     player: null,
     isPlaying: false,
+    mode: 'player', // 'player' for video, 'web' for full website
 
+    // প্লেয়ার ইনিশিয়ালাইজ করা
     initPlayer: function(elementId) {
-        console.log("Initializing Player...");
+        console.log("Initializing Gemini Player...");
         this.player = new YT.Player(elementId, {
             height: '100%',
             width: '100%',
@@ -21,10 +23,35 @@ var GeminiOS = {
         });
     },
 
+    // পুরো ইউটিউব টিভি ওয়েবসাইট ওপেন করার জন্য
+    openYouTubeTV: function() {
+        this.mode = 'web';
+        const overlay = document.getElementById('video-overlay');
+        overlay.style.display = 'block';
+        
+        // প্লেয়ার কন্টেইনারে সরাসরি আইফ্রেম ঢুকিয়ে দিচ্ছি
+        const container = document.getElementById('video-overlay');
+        container.innerHTML = `<iframe id="tv-frame" src="https://www.youtube.com/tv#/" 
+            allow="autoplay; encrypted-media; fullscreen" 
+            style="width:100%; height:100%; border:none;"></iframe>`;
+        console.log("Full YouTube TV Mode Activated.");
+    },
+
+    // রিমোট বা কিবোর্ড কমান্ড প্রসেস করা
     executeCommand: function(cmd) {
-        // প্লেয়ার রেডি না থাকলে কমান্ড কাজ করবে না
+        console.log("Remote Command Received:", cmd);
+
+        // ১. যদি ফুল ওয়েবসাইট (Web Mode) চলে
+        if (this.mode === 'web') {
+            if (cmd === 'Backspace' || cmd === 'Back' || cmd === 'Home') {
+                location.reload(); // ওয়েব মোড থেকে ব্যাক করার সবচেয়ে সেফ উপায়
+            }
+            return;
+        }
+
+        // ২. যদি ভিডিও প্লেয়ার (Player Mode) চলে
         if (!this.player || typeof this.player.loadVideoById !== 'function') {
-            console.warn("Player not ready for command:", cmd);
+            console.warn("Player not ready yet!");
             return;
         }
 
@@ -53,12 +80,13 @@ var GeminiOS = {
     },
 
     loadVideo: function(videoId) {
-        // প্লেয়ার রেডি আছে কি না চেক করা (Safety Check)
+        this.mode = 'player';
         if (this.player && typeof this.player.loadVideoById === 'function') {
             document.getElementById('video-overlay').style.display = 'block';
             this.player.loadVideoById(videoId);
         } else {
-            alert("YouTube Player is still loading... please wait a second.");
+            console.error("YouTube API loading issue.");
+            alert("Please wait, YouTube is loading...");
         }
     }
 };
