@@ -1,9 +1,7 @@
-// gemini-os.js
 var GeminiOS = {
     player: null,
     isPlaying: false,
 
-    // প্লেয়ার ইনিশিয়ালাইজ করা
     initPlayer: function(elementId) {
         this.player = new YT.Player(elementId, {
             height: '100%',
@@ -15,27 +13,28 @@ var GeminiOS = {
         });
     },
 
-    // রিমোট বা কিবোর্ড কমান্ড প্রসেস করা
     executeCommand: function(cmd) {
         if (!this.player) return;
+        console.log("Executing:", cmd);
 
         switch(cmd) {
-            case 'Enter': // Play or Pause
+            case 'Enter': 
                 this.isPlaying ? this.player.pauseVideo() : this.player.playVideo();
                 break;
-            case 'Right': // 10s Forward
+            case 'ArrowRight': 
                 this.player.seekTo(this.player.getCurrentTime() + 10);
                 break;
-            case 'Left': // 10s Rewind
+            case 'ArrowLeft': 
                 this.player.seekTo(this.player.getCurrentTime() - 10);
                 break;
-            case 'Up': // Volume Up
+            case 'ArrowUp': 
                 this.player.setVolume(this.player.getVolume() + 10);
                 break;
-            case 'Down': // Volume Down
+            case 'ArrowDown': 
                 this.player.setVolume(this.player.getVolume() - 10);
                 break;
-            case 'Back': // Close Video
+            case 'Backspace': 
+            case 'Back':
                 document.getElementById('video-overlay').style.display = 'none';
                 this.player.stopVideo();
                 break;
