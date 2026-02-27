@@ -3,34 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gemini Remote | Full Control</title>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <title>Gemini Remote | Local Test</title>
     <style>
         body { background: #000; color: white; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .remote { width: 180px; background: #1a1a1a; padding: 40px 20px; border-radius: 50px; border: 2px solid #333; display: flex; flex-direction: column; align-items: center; gap: 20px; }
+        .remote { width: 180px; background: #1a1a1a; padding: 40px 20px; border-radius: 50px; border: 2px solid #333; display: flex; flex-direction: column; align-items: center; gap: 20px; box-shadow: 0 0 30px rgba(0,0,0,0.5); }
         
         .d-pad { width: 140px; height: 140px; background: #252525; border-radius: 50%; position: relative; }
-        .btn { position: absolute; background: #333; border: none; color: white; border-radius: 10px; cursor: pointer; padding: 10px; }
-        .btn:active { background: #4285f4; }
+        .btn { position: absolute; background: #333; border: none; color: white; border-radius: 10px; cursor: pointer; padding: 10px; transition: 0.1s; }
+        .btn:active { background: #4285f4; transform: scale(0.9); }
 
-        /* D-Pad Layout */
         .up { top: 5px; left: 50%; transform: translateX(-50%); width: 40px; }
         .down { bottom: 5px; left: 50%; transform: translateX(-50%); width: 40px; }
         .left { left: 5px; top: 50%; transform: translateY(-50%); height: 40px; }
         .right { right: 5px; top: 50%; transform: translateY(-50%); height: 40px; }
-        .ok { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 50px; height: 50px; border-radius: 50%; background: #444; font-weight: bold; }
+        .ok { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 50px; height: 50px; border-radius: 50%; background: #444; font-weight: bold; font-size: 14px; }
 
         .extra-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; }
-        .small-btn { background: #333; color: white; border: none; padding: 15px; border-radius: 15px; cursor: pointer; font-size: 12px; }
-        .small-btn:active { background: #e74c3c; }
+        .small-btn { background: #333; color: white; border: none; padding: 15px; border-radius: 15px; cursor: pointer; font-size: 12px; transition: 0.1s; }
+        .small-btn:active { background: #e74c3c; transform: scale(0.9); }
         .youtube { background: white; color: red; font-weight: bold; }
     </style>
 </head>
 <body>
 
     <div class="remote">
-        <h3 style="margin:0; font-size:14px; color:#666;">GEMINI REMOTE</h3>
+        <h3 style="margin:0; font-size:14px; color:#666; letter-spacing: 2px;">GEMINI</h3>
         
         <div class="d-pad">
             <button class="btn up" onclick="send('ArrowUp')">▲</button>
@@ -52,18 +49,20 @@
     </div>
 
     <script>
-        // আপনার Firebase Config এখানে বসান
-        const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            databaseURL: "YOUR_DATABASE_URL",
-            projectId: "YOUR_PROJECT_ID"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database().ref('tv_command');
-
+        // Local Test logic (No Firebase needed for same browser)
         function send(cmd) {
-            db.set(cmd);
             console.log("Command Sent: " + cmd);
+            
+            // LocalStorage-এ কমান্ডটি সেভ করা হচ্ছে
+            localStorage.setItem('gemini_cmd', cmd);
+            
+            // সাথে সাথে ভ্যালু পরিবর্তন করে আবার পাঠানো যেন একই বাটন বারবার কাজ করে
+            localStorage.setItem('gemini_cmd_time', Date.now()); 
+            
+            // ভিব্রেশন ইফেক্ট (ফোনে টেস্ট করলে ভালো লাগবে)
+            if (navigator.vibrate) {
+                navigator.vibrate(50);
+            }
         }
     </script>
 </body>
