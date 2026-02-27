@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gemini OS | Smart TV Experience</title>
+    <title>Gemini OS | Premium OTT Experience</title>
     <style>
         :root {
             --bg-color: #050505;
@@ -23,7 +23,6 @@
             overflow: hidden;
         }
 
-        /* Background Gradient Overlay */
         .bg-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -31,12 +30,11 @@
             z-index: -1;
         }
 
-        /* Top Bar */
         .navbar {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 40px 60px;
+            padding: 30px 60px;
         }
 
         .logo {
@@ -50,36 +48,35 @@
 
         .clock { font-size: 24px; opacity: 0.8; }
 
-        /* Content Area */
-        .content {
-            padding: 0 60px;
-        }
+        .content { padding: 0 60px; }
+        .greeting { font-size: 1.2rem; opacity: 0.6; margin-bottom: 5px; }
+        .featured-title { font-size: 2.5rem; margin-bottom: 30px; font-weight: bold; }
 
-        .greeting { font-size: 1.5rem; opacity: 0.6; margin-bottom: 10px; }
-        .featured-title { font-size: 3rem; margin-bottom: 40px; font-weight: bold; }
-
-        /* App Grid */
+        /* App Grid with Scroll */
         .app-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            display: flex;
             gap: 25px;
+            overflow-x: hidden;
+            padding: 20px 0;
+            transition: all 0.5s ease;
         }
 
         .app-card {
+            min-width: 260px;
+            height: 150px;
             position: relative;
             background: #1c1c1e;
-            border-radius: 15px;
-            height: 180px;
+            border-radius: 12px;
             overflow: hidden;
             border: 4px solid transparent;
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            cursor: pointer;
+            flex-shrink: 0;
         }
 
         .app-card.active {
-            transform: scale(1.1);
+            transform: scale(1.15);
             border-color: var(--card-hover);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.8);
             z-index: 10;
         }
 
@@ -88,26 +85,24 @@
             height: 100%;
             background-size: cover;
             background-position: center;
-            opacity: 0.7;
-            transition: 0.3s;
+            opacity: 0.6;
         }
 
         .app-card.active .card-img { opacity: 1; }
 
         .card-label {
             position: absolute;
-            bottom: 15px;
+            bottom: 12px;
             left: 15px;
-            font-size: 18px;
+            font-size: 16px;
             font-weight: bold;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+            text-shadow: 0 2px 4px rgba(0,0,0,0.9);
         }
 
-        /* Fullscreen Player Layer */
+        /* Video Layer */
         #video-overlay {
             position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
+            top: 0; left: 0; width: 100%; height: 100%;
             background: #000;
             display: none;
             z-index: 1000;
@@ -116,10 +111,11 @@
         .back-hint {
             position: absolute;
             top: 20px; left: 20px;
-            background: rgba(0,0,0,0.5);
-            padding: 10px;
+            background: rgba(0,0,0,0.6);
+            padding: 8px 15px;
             border-radius: 5px;
             z-index: 1001;
+            font-size: 14px;
         }
     </style>
 </head>
@@ -129,35 +125,51 @@
 
     <div class="navbar">
         <div class="logo">GEMINI OS</div>
-        <div class="clock" id="time">12:45 PM</div>
+        <div class="clock" id="time">00:00 AM</div>
     </div>
 
     <div class="content">
-        <div class="greeting" id="greeting-text">Good Evening</div>
-        <div class="featured-title">What would you like to watch?</div>
+        <div class="greeting" id="greeting-text">Welcome</div>
+        <div class="featured-title">Indian OTT & Entertainment</div>
 
-        <div class="app-grid">
+        <div class="app-grid" id="app-grid">
             <div class="app-card active" id="card-1">
                 <div class="card-img" style="background-image: url('https://img.youtube.com/vi/jfKfPfyJRdk/maxresdefault.jpg');"></div>
-                <div class="card-label">Lofi Music</div>
+                <div class="card-label">YouTube</div>
             </div>
             <div class="app-card" id="card-2">
                 <div class="card-img" style="background-image: url('https://img.youtube.com/vi/3JZ_D3ELwOQ/maxresdefault.jpg');"></div>
-                <div class="card-label">Movie Trailers</div>
+                <div class="card-label">Netflix</div>
             </div>
             <div class="app-card" id="card-3">
-                <div class="card-img" style="background-image: url('https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg');"></div>
-                <div class="card-label">YouTube Music</div>
+                <div class="card-img" style="background-image: url('https://img.youtube.com/vi/I2mU-C4Ighw/maxresdefault.jpg');"></div>
+                <div class="card-label">Disney+ Hotstar</div>
             </div>
             <div class="app-card" id="card-4">
+                <div class="card-img" style="background-image: url('https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg');"></div>
+                <div class="card-label">MX Player</div>
+            </div>
+            <div class="app-card" id="card-5">
                 <div class="card-img" style="background-image: url('https://img.youtube.com/vi/5qap5aO4i9A/maxresdefault.jpg');"></div>
-                <div class="card-label">Tech Reviews</div>
+                <div class="card-label">Zee5</div>
+            </div>
+            <div class="app-card" id="card-6">
+                <div class="card-img" style="background-image: url('https://img.youtube.com/vi/M7lc1UVf-VE/maxresdefault.jpg');"></div>
+                <div class="card-label">SonyLIV</div>
+            </div>
+            <div class="app-card" id="card-7">
+                <div class="card-img" style="background-image: url('https://img.youtube.com/vi/98WtmW-ljcE/maxresdefault.jpg');"></div>
+                <div class="card-label">JioCinema</div>
+            </div>
+            <div class="app-card" id="card-8">
+                <div class="card-img" style="background-image: url('https://img.youtube.com/vi/K4TOrB7at0Y/maxresdefault.jpg');"></div>
+                <div class="card-label">Prime Video</div>
             </div>
         </div>
     </div>
 
     <div id="video-overlay">
-        <div class="back-hint">Press BACK to exit</div>
+        <div class="back-hint">Press BACK to Home</div>
         <div id="yt-player"></div>
     </div>
 
@@ -165,33 +177,37 @@
     <script>
         let player;
         let activeIdx = 1;
-        const totalCards = 4;
+        const totalCards = 8;
+        
+        // Video IDs for different apps
         const videoData = {
-            'card-1': 'jfKfPfyJRdk',
-            'card-2': '3JZ_D3ELwOQ',
-            'card-3': 'dQw4w9WgXcQ',
-            'card-4': '5qap5aO4i9A'
+            'card-1': 'jfKfPfyJRdk', // YouTube Lofi
+            'card-2': '3JZ_D3ELwOQ', // Netflix Trailer
+            'card-3': 'I2mU-C4Ighw', // Hotstar Special
+            'card-4': 'dQw4w9WgXcQ', // MX Player Song
+            'card-5': '5qap5aO4i9A', // Zee5 Show
+            'card-6': 'M7lc1UVf-VE', // SonyLIV
+            'card-7': '98WtmW-ljcE', // JioCinema
+            'card-8': 'K4TOrB7at0Y'  // Prime Video
         };
 
-        // Initialize YouTube Player
         function onYouTubeIframeAPIReady() {
             player = new YT.Player('yt-player', {
-                height: '100%',
-                width: '100%',
+                height: '100%', width: '100%',
                 playerVars: { 'autoplay': 1, 'controls': 1, 'rel': 0 }
             });
         }
 
-        // Listen for Remote Commands
         window.addEventListener('storage', (e) => {
             if (e.key === 'tv_command') {
                 const cmd = e.newValue;
                 if (!cmd) return;
-
                 if (cmd === 'Right') navigate(1);
                 if (cmd === 'Left') navigate(-1);
                 if (cmd === 'Enter') openApp();
                 if (cmd === 'Back' || cmd === 'Home') closeApp();
+                
+                // Direct Shortcut Keys from Remote
                 if (cmd === 'Netflix') { activeIdx = 2; updateUI(); openApp(); }
                 if (cmd === 'YouTube') { activeIdx = 1; updateUI(); openApp(); }
             }
@@ -206,7 +222,13 @@
 
         function updateUI() {
             document.querySelectorAll('.app-card').forEach(card => card.classList.remove('active'));
-            document.getElementById('card-' + activeIdx).classList.add('active');
+            const activeCard = document.getElementById('card-' + activeIdx);
+            activeCard.classList.add('active');
+            
+            // Auto-scroll logic
+            const grid = document.getElementById('app-grid');
+            const scrollPos = (activeIdx - 1) * 285; // Card width + gap
+            grid.scrollTo({ left: scrollPos, behavior: 'smooth' });
         }
 
         function openApp() {
@@ -220,11 +242,9 @@
             player.stopVideo();
         }
 
-        // Clock and Greeting
         function updateClock() {
             const now = new Date();
             document.getElementById('time').innerText = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-            
             const hours = now.getHours();
             let greet = "Good Evening";
             if (hours < 12) greet = "Good Morning";
