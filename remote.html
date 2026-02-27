@@ -3,67 +3,158 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gemini Remote | Local Test</title>
+    <title>Gemini OS | Smart Remote</title>
     <style>
-        body { background: #000; color: white; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .remote { width: 180px; background: #1a1a1a; padding: 40px 20px; border-radius: 50px; border: 2px solid #333; display: flex; flex-direction: column; align-items: center; gap: 20px; box-shadow: 0 0 30px rgba(0,0,0,0.5); }
+        :root {
+            --remote-bg: #1a1a1c;
+            --btn-bg: #2d2d30;
+            --accent: #4285f4;
+            --danger: #ff4b2b;
+            --netflix: #e50914;
+        }
+
+        body { 
+            background: #050505; 
+            color: white; 
+            font-family: 'Segoe UI', sans-serif; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            margin: 0; 
+            user-select: none;
+        }
+
+        /* Remote Body */
+        .remote { 
+            width: 200px; 
+            background: var(--remote-bg); 
+            padding: 30px 15px; 
+            border-radius: 60px; 
+            border: 1px solid #333; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+        }
+
+        .brand { font-size: 12px; color: #666; letter-spacing: 3px; margin-bottom: 20px; font-weight: bold; }
+
+        /* Power & Mute Row */
+        .top-row { width: 100%; display: flex; justify-content: space-between; padding: 0 20px; margin-bottom: 20px; }
+        .power-btn { color: var(--danger); background: var(--btn-bg); border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-weight: bold; }
         
-        .d-pad { width: 140px; height: 140px; background: #252525; border-radius: 50%; position: relative; }
-        .btn { position: absolute; background: #333; border: none; color: white; border-radius: 10px; cursor: pointer; padding: 10px; transition: 0.1s; }
-        .btn:active { background: #4285f4; transform: scale(0.9); }
+        /* D-Pad Style */
+        .d-pad { 
+            width: 150px; 
+            height: 150px; 
+            background: #252527; 
+            border-radius: 50%; 
+            position: relative; 
+            margin-bottom: 25px;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+        }
+        
+        .btn { position: absolute; background: transparent; border: none; color: #bbb; cursor: pointer; font-size: 18px; transition: 0.1s; display: flex; align-items: center; justify-content: center; }
+        .btn:active { color: white; transform: scale(0.9); }
 
-        .up { top: 5px; left: 50%; transform: translateX(-50%); width: 40px; }
-        .down { bottom: 5px; left: 50%; transform: translateX(-50%); width: 40px; }
-        .left { left: 5px; top: 50%; transform: translateY(-50%); height: 40px; }
-        .right { right: 5px; top: 50%; transform: translateY(-50%); height: 40px; }
-        .ok { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 50px; height: 50px; border-radius: 50%; background: #444; font-weight: bold; font-size: 14px; }
+        .up { top: 10px; left: 50%; transform: translateX(-50%); width: 100%; height: 40px; }
+        .down { bottom: 10px; left: 50%; transform: translateX(-50%); width: 100%; height: 40px; }
+        .left { left: 10px; top: 50%; transform: translateY(-50%); height: 100%; width: 40px; }
+        .right { right: 10px; top: 50%; transform: translateY(-50%); height: 100%; width: 40px; }
+        
+        /* OK Center Button */
+        .ok { 
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+            width: 60px; height: 60px; border-radius: 50%; 
+            background: var(--btn-bg); color: white; font-weight: bold; 
+            border: 1px solid #444; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+        .ok:active { background: var(--accent); }
 
-        .extra-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; }
-        .small-btn { background: #333; color: white; border: none; padding: 15px; border-radius: 15px; cursor: pointer; font-size: 12px; transition: 0.1s; }
-        .small-btn:active { background: #e74c3c; transform: scale(0.9); }
-        .youtube { background: white; color: red; font-weight: bold; }
+        /* Navigation Row */
+        .nav-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; padding: 0 10px; margin-bottom: 20px; }
+        .nav-btn { background: var(--btn-bg); color: white; border: none; padding: 12px; border-radius: 12px; cursor: pointer; font-size: 11px; text-transform: uppercase; font-weight: 600; }
+        .nav-btn:active { background: #444; }
+
+        /* Volume & Channel Rockers */
+        .rocker-container { display: flex; gap: 20px; margin-bottom: 20px; }
+        .rocker { display: flex; flex-direction: column; background: var(--btn-bg); border-radius: 20px; padding: 5px; }
+        .rocker button { background: transparent; border: none; color: white; padding: 10px 15px; cursor: pointer; font-weight: bold; }
+
+        /* Shortcut Buttons */
+        .shortcuts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; padding: 0 10px; }
+        .sc-btn { border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 12px; }
+        .yt-btn { background: white; color: #ff0000; }
+        .nf-btn { background: #222; color: var(--netflix); }
     </style>
 </head>
 <body>
 
     <div class="remote">
-        <h3 style="margin:0; font-size:14px; color:#666; letter-spacing: 2px;">GEMINI</h3>
+        <div class="brand">GEMINI OS</div>
+
+        <div class="top-row">
+            <button class="power-btn" onclick="send('Power')">⏻</button>
+            <button class="nav-btn" style="border-radius: 50%; width:40px;" onclick="send('Mute')">🔇</button>
+        </div>
         
         <div class="d-pad">
             <button class="btn up" onclick="send('ArrowUp')">▲</button>
             <button class="btn down" onclick="send('ArrowDown')">▼</button>
             <button class="btn left" onclick="send('ArrowLeft')">◀</button>
             <button class="btn right" onclick="send('ArrowRight')">▶</button>
-            <button class="btn ok" onclick="send('Enter')">OK</button>
+            <button class="ok" onclick="send('Enter')">OK</button>
         </div>
 
-        <div class="extra-btns">
-            <button class="small-btn" onclick="send('Backspace')">BACK</button>
-            <button class="small-btn" onclick="send('Home')">HOME</button>
+        <div class="nav-row">
+            <button class="nav-btn" onclick="send('Backspace')">Back</button>
+            <button class="nav-btn" onclick="send('Home')">Home</button>
         </div>
 
-        <div class="extra-btns">
-            <button class="small-btn youtube" onclick="send('YouTube_Direct')">YouTube</button>
-            <button class="small-btn" onclick="send('Mute')">MUTE</button>
+        <div class="rocker-container">
+            <div class="rocker">
+                <button onclick="send('ArrowUp')">+</button>
+                <span style="font-size: 9px; text-align: center; color: #666;">VOL</span>
+                <button onclick="send('ArrowDown')">-</button>
+            </div>
+            <div class="rocker">
+                <button onclick="send('PageUp')">^</button>
+                <span style="font-size: 9px; text-align: center; color: #666;">CH</span>
+                <button onclick="send('PageDown')">v</button>
+            </div>
+        </div>
+
+        <div class="shortcuts">
+            <button class="sc-btn yt-btn" onclick="send('YouTube_Direct')">YouTube</button>
+            <button class="sc-btn nf-btn" onclick="send('Netflix_Direct')">Netflix</button>
         </div>
     </div>
 
     <script>
-        // Local Test logic (No Firebase needed for same browser)
         function send(cmd) {
-            console.log("Command Sent: " + cmd);
+            console.log("Remote Sent: " + cmd);
             
-            // LocalStorage-এ কমান্ডটি সেভ করা হচ্ছে
+            // একই বাটন বারবার চাপলে যাতে ব্রাউজার সিগন্যাল পায়, তাই অবজেক্ট আকারে পাঠানো হচ্ছে
+            const payload = {
+                command: cmd,
+                timestamp: Date.now()
+            };
+
+            // লোকাল স্টোরেজে ডেটা পাঠানো (এটি আপনার index.html এর storage লিসেনার ধরবে)
             localStorage.setItem('gemini_cmd', cmd);
+            localStorage.setItem('gemini_ts', Date.now()); 
             
-            // সাথে সাথে ভ্যালু পরিবর্তন করে আবার পাঠানো যেন একই বাটন বারবার কাজ করে
-            localStorage.setItem('gemini_cmd_time', Date.now()); 
-            
-            // ভিব্রেশন ইফেক্ট (ফোনে টেস্ট করলে ভালো লাগবে)
+            // মোবাইল ভাইব্রেশন
             if (navigator.vibrate) {
-                navigator.vibrate(50);
+                navigator.vibrate(40);
             }
         }
+
+        // ব্রাউজার যদি একই পেজ রিলোড না করে ডেটা সেন্ড করতে চায়
+        window.addEventListener('storage', () => {
+             // দিস ইজ জাস্ট ফর ডিবাগিং
+        });
     </script>
 </body>
 </html>
