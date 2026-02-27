@@ -3,16 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gemini OS | Keyboard & Remote Full Control</title>
-    
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-
+    <title>Gemini OS | TV Fix</title>
     <style>
         :root {
             --bg: #050505;
             --accent: #4285f4;
-            --card-bg: #1c1c1e;
         }
 
         body, html {
@@ -22,177 +17,68 @@
             overflow: hidden;
         }
 
-        /* Background Design */
-        .bg-gradient {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at 20% 30%, #1a1a1a 0%, #050505 100%);
-            z-index: -1;
+        /* App Grid Layout */
+        .app-grid { display: flex; gap: 20px; padding: 50px; }
+        .app-card { 
+            width: 220px; height: 130px; background: #1c1c1e; 
+            border-radius: 15px; display: flex; align-items: center; 
+            justify-content: center; border: 4px solid transparent; cursor: pointer; 
         }
+        .app-card.active { border-color: white; transform: scale(1.05); transition: 0.3s; }
 
-        /* Navbar */
-        .navbar {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 30px 60px;
-        }
-
-        .logo {
-            font-size: 32px; font-weight: 900;
-            background: linear-gradient(to right, #4285f4, #9b51e0);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-        }
-
-        .clock { font-size: 24px; opacity: 0.8; }
-
-        /* App Grid */
-        .content { padding: 0 60px; }
-        .featured-title { font-size: 2.5rem; margin-bottom: 30px; font-weight: bold; }
-
-        .app-grid {
-            display: flex; gap: 30px;
-            overflow-x: hidden; padding: 30px 0;
-            scroll-behavior: smooth;
-        }
-
-        .app-card {
-            min-width: 260px; height: 160px;
-            background: var(--card-bg); border-radius: 20px;
-            border: 4px solid transparent;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            flex-shrink: 0; display: flex; align-items: center; justify-content: center;
-            cursor: pointer;
-        }
-
-        .app-card.active {
-            transform: scale(1.15);
-            border-color: white;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            background: #2c2c2e;
-        }
-
-        .app-logo { width: 65%; pointer-events: none; }
-
-        /* Full Screen Player Overlay */
+        /* Video Overlay Fix */
         #video-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #000; display: none; z-index: 1000;
+            position: fixed; top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background: #000;
+            display: none; /* শুরুতে লুকানো থাকবে */
+            z-index: 9999;
         }
 
-        .back-hint {
-            position: absolute; top: 30px; left: 30px;
-            background: rgba(0,0,0,0.6); color: white;
-            padding: 12px 25px; border-radius: 50px;
-            z-index: 1001; font-weight: bold; border: 1px solid rgba(255,255,255,0.2);
-            backdrop-filter: blur(10px); cursor: pointer;
+        /* এটি নিশ্চিত করে যে ইউটিউব প্লেয়ার পুরো স্ক্রিন জুড়ে থাকবে */
+        #yt-player {
+            width: 100%;
+            height: 100%;
+            border: none;
         }
     </style>
 </head>
 <body>
 
-    <div class="bg-gradient"></div>
-
-    <div class="navbar">
-        <div class="logo">GEMINI OS</div>
-        <div class="clock" id="time">00:00 AM</div>
-    </div>
-
-    <div class="content">
-        <div class="featured-title">OTT Hub</div>
-        <div class="app-grid" id="app-grid">
-            <div class="app-card active" id="card-1" onclick="selectAndOpen(1)"><img class="app-logo" src="https://upload.wikimedia.org/wikipedia/commons/e/ef/Youtube_logo.png"></div>
-            <div class="app-card" id="card-2" onclick="selectAndOpen(2)"><img class="app-logo" src="https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg"></div>
-            <div class="app-card" id="card-3" onclick="selectAndOpen(3)"><img class="app-logo" src="https://upload.wikimedia.org/wikipedia/commons/3/3e/Disney%2B_Hotstar_logo.svg"></div>
-            <div class="app-card" id="card-4" onclick="selectAndOpen(4)"><img class="app-logo" src="https://upload.wikimedia.org/wikipedia/commons/b/b3/MX_Player_logo_%282019%29.png"></div>
-            <div class="app-card" id="card-5" onclick="selectAndOpen(5)"><img class="app-logo" src="https://upload.wikimedia.org/wikipedia/commons/5/5a/Zee5_logo.svg"></div>
-            <div class="app-card" id="card-6" onclick="selectAndOpen(6)"><img class="app-logo" src="https://upload.wikimedia.org/wikipedia/commons/c/c5/SonyLIV_logo.svg"></div>
+    <div class="app-grid">
+        <div class="app-card active" id="card-1" onclick="GeminiOS.loadVideo('jfKfPfyJRdk')">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/e/ef/Youtube_logo.png" width="120">
         </div>
     </div>
 
     <div id="video-overlay">
-        <div class="back-hint" onclick="closeApp()">⬅ BACK TO HOME</div>
         <div id="yt-player"></div>
     </div>
 
     <script src="https://www.youtube.com/iframe_api"></script>
-    <script>
-        // --- Gemini OS Core Logic ---
-        let player;
-        let activeIdx = 1;
-        let isVideoMode = false;
-        const totalCards = 6;
-        
-        const videoData = {
-            1: 'jfKfPfyJRdk', 2: '3JZ_D3ELwOQ', 3: 'I2mU-C4Ighw', 
-            4: 'dQw4w9WgXcQ', 5: '5qap5aO4i9A', 6: 'M7lc1UVf-VE'
-        };
+    <script src="gemini-os.js"></script>
 
-        // YouTube Player Initialization
+    <script>
+        // ইউটিউব এপিআই রেডি হলে কল হবে
         function onYouTubeIframeAPIReady() {
-            player = new YT.Player('yt-player', {
-                height: '100%', width: '100%',
-                playerVars: { 'autoplay': 1, 'controls': 1, 'rel': 0, 'enablejsapi': 1 }
-            });
+            if (window.GeminiOS) {
+                GeminiOS.initPlayer('yt-player');
+                console.log("Player Initialized");
+            }
         }
 
-        // --- Keyboard Control System ---
+        // কিবোর্ড কন্ট্রোল টেস্ট
         document.addEventListener('keydown', (e) => {
-            if (!isVideoMode) {
-                // Home Screen Controls
-                if (e.key === "ArrowRight") navigate(1);
-                if (e.key === "ArrowLeft") navigate(-1);
-                if (e.key === "Enter") openApp();
-            } else {
-                // Video Player Controls
-                if (e.key === "Backspace" || e.key === "Escape") closeApp();
-                
-                // YouTube API Controls
-                if (e.code === "Space") {
-                    const state = player.getPlayerState();
-                    state === 1 ? player.pauseVideo() : player.playVideo();
-                }
-                if (e.key === "ArrowRight") player.seekTo(player.getCurrentTime() + 10); // Forward 10s
-                if (e.key === "ArrowLeft") player.seekTo(player.getCurrentTime() - 10);  // Rewind 10s
-                if (e.key === "ArrowUp") player.setVolume(player.getVolume() + 10);     // Vol Up
-                if (e.key === "ArrowDown") player.setVolume(player.getVolume() - 10);   // Vol Down
-            }
+            GeminiOS.executeCommand(e.key);
         });
 
-        function navigate(dir) {
-            activeIdx += dir;
-            if (activeIdx > totalCards) activeIdx = 1;
-            if (activeIdx < 1) activeIdx = totalCards;
-            updateUI();
-        }
-
-        function updateUI() {
-            document.querySelectorAll('.app-card').forEach(c => c.classList.remove('active'));
-            document.getElementById('card-' + activeIdx).classList.add('active');
-            
-            const grid = document.getElementById('app-grid');
-            grid.scrollTo({ left: (activeIdx - 1) * 290 - 100, behavior: 'smooth' });
-        }
-
-        function openApp() {
-            isVideoMode = true;
-            document.getElementById('video-overlay').style.display = 'block';
-            player.loadVideoById(videoData[activeIdx]);
-        }
-
-        function closeApp() {
-            isVideoMode = false;
-            document.getElementById('video-overlay').style.display = 'none';
-            player.stopVideo();
-        }
-
-        function selectAndOpen(idx) {
-            activeIdx = idx;
-            updateUI();
-            setTimeout(openApp, 100);
-        }
-
-        // Clock Update
-        setInterval(() => {
-            document.getElementById('time').innerText = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-        }, 1000);
+        // একই ব্রাউজারে রিমোট টেস্ট করার জন্য
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'gemini_cmd' && e.newValue) {
+                GeminiOS.executeCommand(e.newValue);
+                localStorage.removeItem('gemini_cmd');
+            }
+        });
     </script>
 </body>
 </html>
