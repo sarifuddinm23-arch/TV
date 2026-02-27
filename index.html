@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gemini OS | Keyboard & Remote Ready</title>
+    <title>Gemini OS | Premium TV Interface</title>
     <style>
         :root {
             --bg-color: #050505;
@@ -16,73 +16,83 @@
             margin: 0; padding: 0; width: 100%; height: 100%;
             background-color: var(--bg-color);
             color: var(--text-main);
-            font-family: 'Roboto', 'Segoe UI', sans-serif;
+            font-family: 'Roboto', sans-serif;
             overflow: hidden;
         }
 
+        /* Background Design */
         .bg-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: radial-gradient(circle at 20% 30%, #1a1a1a 0%, #050505 100%);
             z-index: -1;
         }
 
+        /* Navbar */
         .navbar {
             display: flex; justify-content: space-between; align-items: center;
             padding: 30px 60px;
         }
 
         .logo {
-            font-size: 28px; font-weight: 800;
+            font-size: 30px; font-weight: 800;
             background: linear-gradient(to right, #4285f4, #9b51e0);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
 
-        .clock { font-size: 24px; opacity: 0.8; }
+        .clock { font-size: 24px; opacity: 0.8; font-weight: 300; }
 
+        /* Main Content */
         .content { padding: 0 60px; }
         .greeting { font-size: 1.2rem; opacity: 0.6; margin-bottom: 5px; }
         .featured-title { font-size: 2.5rem; margin-bottom: 30px; font-weight: bold; }
 
+        /* App Grid Scrollable */
         .app-grid {
             display: flex; gap: 30px;
-            overflow-x: hidden; padding: 20px 0;
+            overflow-x: hidden; padding: 25px 0;
             transition: all 0.5s ease;
+            scroll-behavior: smooth;
         }
 
+        /* App Cards */
         .app-card {
-            min-width: 220px; height: 140px;
+            min-width: 240px; height: 150px;
             position: relative; background: #1c1c1e;
-            border-radius: 15px; overflow: hidden;
+            border-radius: 18px; overflow: hidden;
             border: 4px solid transparent;
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
         }
 
         .app-card.active {
             transform: scale(1.15);
             border-color: var(--card-hover);
-            box-shadow: 0 15px 40px rgba(255,255,255,0.15);
+            box-shadow: 0 15px 45px rgba(255,255,255,0.15);
             background: #2c2c2e;
         }
 
         .app-logo {
             width: 70%; height: auto; max-height: 80%;
-            object-fit: contain; filter: grayscale(20%);
+            object-fit: contain; pointer-events: none;
+            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.5));
         }
 
-        .app-card.active .app-logo { filter: grayscale(0%); transform: scale(1.1); }
-
+        /* Video Player Overlay */
         #video-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: #000; display: none; z-index: 1000;
         }
 
-        .back-hint {
-            position: absolute; top: 20px; left: 20px;
-            background: rgba(0,0,0,0.6); padding: 10px 20px;
-            border-radius: 50px; z-index: 1001; font-size: 14px;
-            border: 1px solid rgba(255,255,255,0.2);
+        .back-btn {
+            position: absolute; top: 30px; left: 30px;
+            background: rgba(255,255,255,0.2); color: white;
+            padding: 12px 25px; border-radius: 50px;
+            z-index: 1001; cursor: pointer; border: 1px solid rgba(255,255,255,0.3);
+            font-weight: bold; backdrop-filter: blur(10px);
         }
+
+        .back-btn:hover { background: rgba(255,255,255,0.4); }
     </style>
 </head>
 <body>
@@ -95,39 +105,39 @@
     </div>
 
     <div class="content">
-        <div class="greeting" id="greeting-text">Welcome</div>
-        <div class="featured-title">OTT Hub</div>
+        <div class="greeting" id="greeting-text">Welcome Back</div>
+        <div class="featured-title">Featured OTT & Apps</div>
 
         <div class="app-grid" id="app-grid">
-            <div class="app-card active" id="card-1">
+            <div class="app-card active" id="card-1" onclick="selectAndOpen(1)">
                 <img class="app-logo" src="https://upload.wikimedia.org/wikipedia/commons/e/ef/Youtube_logo.png" alt="YouTube">
             </div>
-            <div class="app-card" id="card-2">
+            <div class="app-card" id="card-2" onclick="selectAndOpen(2)">
                 <img class="app-logo" src="https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg" alt="Netflix">
             </div>
-            <div class="app-card" id="card-3">
+            <div class="app-card" id="card-3" onclick="selectAndOpen(3)">
                 <img class="app-logo" src="https://upload.wikimedia.org/wikipedia/commons/3/3e/Disney%2B_Hotstar_logo.svg" alt="Hotstar">
             </div>
-            <div class="app-card" id="card-4">
+            <div class="app-card" id="card-4" onclick="selectAndOpen(4)">
                 <img class="app-logo" src="https://upload.wikimedia.org/wikipedia/commons/b/b3/MX_Player_logo_%282019%29.png" alt="MX Player">
             </div>
-            <div class="app-card" id="card-5">
+            <div class="app-card" id="card-5" onclick="selectAndOpen(5)">
                 <img class="app-logo" src="https://upload.wikimedia.org/wikipedia/commons/5/5a/Zee5_logo.svg" alt="Zee5">
             </div>
-            <div class="app-card" id="card-6">
+            <div class="app-card" id="card-6" onclick="selectAndOpen(6)">
                 <img class="app-logo" src="https://upload.wikimedia.org/wikipedia/commons/c/c5/SonyLIV_logo.svg" alt="SonyLIV">
             </div>
-            <div class="app-card" id="card-7">
+            <div class="app-card" id="card-7" onclick="selectAndOpen(7)">
                 <img class="app-logo" src="https://upload.wikimedia.org/wikipedia/commons/b/bf/JioCinema_Logo.svg" alt="JioCinema">
             </div>
-            <div class="app-card" id="card-8">
+            <div class="app-card" id="card-8" onclick="selectAndOpen(8)">
                 <img class="app-logo" src="https://upload.wikimedia.org/wikipedia/commons/1/11/Amazon_Prime_Video_logo.svg" alt="Prime">
             </div>
         </div>
     </div>
 
     <div id="video-overlay">
-        <div class="back-hint">Press BACKSPACE or ESC to exit</div>
+        <div class="back-btn" onclick="closeApp()">⬅ BACK TO HOME</div>
         <div id="yt-player"></div>
     </div>
 
@@ -136,21 +146,30 @@
         let player;
         let activeIdx = 1;
         const totalCards = 8;
+        
+        // Video Database
         const videoData = {
-            'card-1': 'jfKfPfyJRdk', 'card-2': '3JZ_D3ELwOQ',
-            'card-3': 'I2mU-C4Ighw', 'card-4': 'dQw4w9WgXcQ',
-            'card-5': '5qap5aO4i9A', 'card-6': 'M7lc1UVf-VE',
-            'card-7': '98WtmW-ljcE', 'card-8': 'K4TOrB7at0Y'
+            1: 'jfKfPfyJRdk', // YouTube
+            2: '3JZ_D3ELwOQ', // Netflix
+            3: 'I2mU-C4Ighw', // Hotstar
+            4: 'dQw4w9WgXcQ', // MX Player
+            5: '5qap5aO4i9A', // Zee5
+            6: 'M7lc1UVf-VE', // SonyLIV
+            7: '98WtmW-ljcE', // JioCinema
+            8: 'K4TOrB7at0Y'  // Prime
         };
 
+        // Initialize YouTube
         function onYouTubeIframeAPIReady() {
             player = new YT.Player('yt-player', {
                 height: '100%', width: '100%',
-                playerVars: { 'autoplay': 1, 'controls': 1 }
+                playerVars: { 'autoplay': 1, 'controls': 1, 'rel': 0, 'showinfo': 0 }
             });
         }
 
-        // --- Keyboard Controls ---
+        // --- CONTROLS LOGIC ---
+
+        // 1. Keyboard Controls
         document.addEventListener('keydown', (e) => {
             if (e.key === "ArrowRight") navigate(1);
             if (e.key === "ArrowLeft") navigate(-1);
@@ -158,7 +177,14 @@
             if (e.key === "Backspace" || e.key === "Escape") closeApp();
         });
 
-        // --- Remote/Storage Controls ---
+        // 2. Mouse Click Controls
+        function selectAndOpen(idx) {
+            activeIdx = idx;
+            updateUI();
+            setTimeout(openApp, 100); // Small delay for visual effect
+        }
+
+        // 3. Remote/Storage Controls (For local testing on same browser)
         window.addEventListener('storage', (e) => {
             if (e.key === 'tv_command') {
                 const cmd = e.newValue;
@@ -167,6 +193,8 @@
                 if (cmd === 'Left') navigate(-1);
                 if (cmd === 'Enter') openApp();
                 if (cmd === 'Back' || cmd === 'Home') closeApp();
+                if (cmd === 'Netflix') { activeIdx = 2; updateUI(); openApp(); }
+                if (cmd === 'YouTube') { activeIdx = 1; updateUI(); openApp(); }
             }
         });
 
@@ -178,28 +206,42 @@
         }
 
         function updateUI() {
+            // Update Active Class
             document.querySelectorAll('.app-card').forEach(card => card.classList.remove('active'));
             document.getElementById('card-' + activeIdx).classList.add('active');
             
+            // Smooth Scroll to Center the Active Card
             const grid = document.getElementById('app-grid');
-            const scrollPos = (activeIdx - 1) * 250; 
+            const cardWidth = 270; // Width + Gap
+            const scrollPos = (activeIdx - 1) * cardWidth - (window.innerWidth / 4);
             grid.scrollTo({ left: scrollPos, behavior: 'smooth' });
         }
 
         function openApp() {
-            const videoId = videoData['card-' + activeIdx];
+            const vId = videoData[activeIdx];
             document.getElementById('video-overlay').style.display = 'block';
-            player.loadVideoById(videoId);
+            if (player && player.loadVideoById) {
+                player.loadVideoById(vId);
+            }
         }
 
         function closeApp() {
             document.getElementById('video-overlay').style.display = 'none';
-            player.stopVideo();
+            if (player && player.stopVideo) {
+                player.stopVideo();
+            }
         }
 
+        // Clock & Greeting
         function updateClock() {
             const now = new Date();
             document.getElementById('time').innerText = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            
+            const hrs = now.getHours();
+            let g = "Good Evening";
+            if (hrs < 12) g = "Good Morning";
+            else if (hrs < 17) g = "Good Afternoon";
+            document.getElementById('greeting-text').innerText = g;
         }
         setInterval(updateClock, 1000);
         updateClock();
