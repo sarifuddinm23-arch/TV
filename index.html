@@ -3,90 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gemini OS | Universal Remote Support</title>
+    <title>Gemini OS | Full Remote Control</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-    
     <style>
-        :root {
-            --bg-color: #050505;
-            --accent: #4285f4;
-            --card-hover: #ffffff;
-        }
-
-        body, html {
-            margin: 0; padding: 0; width: 100%; height: 100%;
-            background-color: var(--bg-color);
-            color: white; font-family: 'Roboto', sans-serif;
-            overflow: hidden;
-        }
-
-        /* Animated Background */
-        .bg-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at 20% 30%, #1a1a1a 0%, #050505 100%);
-            z-index: -1;
-        }
-
-        .navbar { display: flex; justify-content: space-between; padding: 30px 60px; align-items: center; }
+        :root { --bg: #050505; --accent: #4285f4; }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: var(--bg); color: white; font-family: 'Roboto', sans-serif; overflow: hidden; }
+        .bg-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at 20% 30%, #1a1a1a 0%, #050505 100%); z-index: -1; }
+        .navbar { display: flex; justify-content: space-between; padding: 30px 60px; }
         .logo { font-size: 32px; font-weight: 900; background: linear-gradient(45deg, #4285f4, #9b51e0); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .clock { font-size: 24px; opacity: 0.8; }
-
-        .content { padding: 0 60px; margin-top: 20px; }
-        .featured-title { font-size: 2.5rem; margin-bottom: 30px; font-weight: bold; }
-
-        /* Smooth App Grid */
-        .app-grid {
-            display: flex; gap: 30px;
-            overflow-x: hidden; padding: 30px 0;
-            scroll-behavior: smooth;
-        }
-
-        .app-card {
-            min-width: 260px; height: 160px;
-            background: #1c1c1e; border-radius: 20px;
-            border: 4px solid transparent;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            flex-shrink: 0; display: flex; align-items: center; justify-content: center;
-            cursor: pointer;
-        }
-
-        .app-card.active {
-            transform: scale(1.15);
-            border-color: var(--card-hover);
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5), 0 0 20px rgba(255,255,255,0.1);
-            background: #2c2c2e;
-        }
-
-        .app-logo { width: 65%; height: auto; object-fit: contain; pointer-events: none; }
-
-        /* Full Screen Video Overlay */
-        #video-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #000; display: none; z-index: 1000;
-        }
-
-        .back-indicator {
-            position: absolute; top: 30px; left: 30px;
-            background: rgba(0,0,0,0.6); color: white;
-            padding: 12px 25px; border-radius: 50px;
-            z-index: 1001; font-weight: bold; border: 1px solid rgba(255,255,255,0.2);
-            backdrop-filter: blur(10px); cursor: pointer;
-        }
+        .content { padding: 0 60px; }
+        .app-grid { display: flex; gap: 30px; overflow-x: hidden; padding: 30px 0; scroll-behavior: smooth; }
+        .app-card { min-width: 260px; height: 160px; background: #1c1c1e; border-radius: 20px; border: 4px solid transparent; transition: 0.4s; flex-shrink: 0; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .app-card.active { transform: scale(1.15); border-color: white; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+        .app-logo { width: 65%; pointer-events: none; }
+        #video-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; display: none; z-index: 1000; }
     </style>
 </head>
 <body>
 
     <div class="bg-overlay"></div>
-
     <div class="navbar">
         <div class="logo">GEMINI OS</div>
         <div class="clock" id="time">00:00 AM</div>
     </div>
 
     <div class="content">
-        <div class="featured-title">Featured Apps</div>
-
+        <h2>Recommended</h2>
         <div class="app-grid" id="app-grid">
             <div class="app-card active" id="card-1" onclick="selectAndOpen(1)"><img class="app-logo" src="https://upload.wikimedia.org/wikipedia/commons/e/ef/Youtube_logo.png"></div>
             <div class="app-card" id="card-2" onclick="selectAndOpen(2)"><img class="app-logo" src="https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg"></div>
@@ -94,95 +38,71 @@
             <div class="app-card" id="card-4" onclick="selectAndOpen(4)"><img class="app-logo" src="https://upload.wikimedia.org/wikipedia/commons/b/b3/MX_Player_logo_%282019%29.png"></div>
             <div class="app-card" id="card-5" onclick="selectAndOpen(5)"><img class="app-logo" src="https://upload.wikimedia.org/wikipedia/commons/5/5a/Zee5_logo.svg"></div>
             <div class="app-card" id="card-6" onclick="selectAndOpen(6)"><img class="app-logo" src="https://upload.wikimedia.org/wikipedia/commons/c/c5/SonyLIV_logo.svg"></div>
-            <div class="app-card" id="card-7" onclick="selectAndOpen(7)"><img class="app-logo" src="https://upload.wikimedia.org/wikipedia/commons/b/bf/JioCinema_Logo.svg"></div>
-            <div class="app-card" id="card-8" onclick="selectAndOpen(8)"><img class="app-logo" src="https://upload.wikimedia.org/wikipedia/commons/1/11/Amazon_Prime_Video_logo.svg"></div>
         </div>
     </div>
 
-    <div id="video-overlay">
-        <div class="back-indicator" onclick="closeApp()">⬅ BACK TO HOME</div>
-        <div id="yt-player"></div>
-    </div>
+    <div id="video-overlay"><div id="yt-player"></div></div>
 
     <script src="https://www.youtube.com/iframe_api"></script>
     <script>
-        // 1. Firebase Configuration (Replace with your actual keys)
-        const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            databaseURL: "YOUR_DATABASE_URL",
-            projectId: "YOUR_PROJECT_ID"
-        };
+        // --- FIREBASE CONFIG (নিজে সেট করুন) ---
+        const firebaseConfig = { apiKey: "YOUR_KEY", databaseURL: "YOUR_URL", projectId: "YOUR_ID" };
         firebase.initializeApp(firebaseConfig);
         const dbRef = firebase.database().ref('tv_command');
 
-        let player;
-        let activeIdx = 1;
-        const totalCards = 8;
-        const videoData = {
-            1: '3JZ_D3ELwOQ', 2: 'jfKfPfyJRdk', 3: 'I2mU-C4Ighw', 
-            4: 'dQw4w9WgXcQ', 5: '5qap5aO4i9A', 6: 'M7lc1UVf-VE', 
-            7: '98WtmW-ljcE', 8: 'K4TOrB7at0Y'
-        };
+        let player, activeIdx = 1, isPlaying = false;
+        const videoData = { 1:'jfKfPfyJRdk', 2:'3JZ_D3ELwOQ', 3:'I2mU-C4Ighw', 4:'dQw4w9WgXcQ', 5:'5qap5aO4i9A', 6:'M7lc1UVf-VE' };
 
         function onYouTubeIframeAPIReady() {
-            player = new YT.Player('yt-player', {
-                height: '100%', width: '100%',
-                playerVars: { 'autoplay': 1, 'controls': 1, 'rel': 0 }
-            });
+            player = new YT.Player('yt-player', { height: '100%', width: '100%', playerVars: { 'autoplay': 1, 'controls': 0 } });
         }
 
-        // 2. Real-time Remote Listener
+        // --- REMOTE COMMAND LISTENER ---
         dbRef.on('value', (snapshot) => {
             const cmd = snapshot.val();
-            if (cmd) {
+            if (!cmd) return;
+
+            const isOverlayOpen = document.getElementById('video-overlay').style.display === 'block';
+
+            if (!isOverlayOpen) {
+                // হোমে থাকা অবস্থায় কন্ট্রোল
                 if (cmd === 'Right') navigate(1);
                 if (cmd === 'Left') navigate(-1);
                 if (cmd === 'Enter') openApp();
-                if (cmd === 'Back' || cmd === 'Home') closeApp();
-                dbRef.set(null); // Clear command
+            } else {
+                // ভিডিও চলাকালীন কন্ট্রোল
+                if (cmd === 'Back') closeApp();
+                if (cmd === 'Enter') { // OK বাটন দিয়ে Play/Pause
+                    if (isPlaying) { player.pauseVideo(); isPlaying = false; }
+                    else { player.playVideo(); isPlaying = true; }
+                }
+                if (cmd === 'Right') player.seekTo(player.getCurrentTime() + 10); // ১০ সেকেন্ড আগে
+                if (cmd === 'Left') player.seekTo(player.getCurrentTime() - 10);  // ১০ সেকেন্ড পিছে
             }
+            dbRef.set(null); 
         });
 
         function navigate(dir) {
             activeIdx += dir;
-            if (activeIdx > totalCards) activeIdx = 1;
-            if (activeIdx < 1) activeIdx = totalCards;
-            updateUI();
-        }
-
-        function updateUI() {
+            if (activeIdx > 6) activeIdx = 1; if (activeIdx < 1) activeIdx = 6;
             document.querySelectorAll('.app-card').forEach(c => c.classList.remove('active'));
             document.getElementById('card-' + activeIdx).classList.add('active');
-            const grid = document.getElementById('app-grid');
-            grid.scrollTo({ left: (activeIdx - 1) * 290 - 100, behavior: 'smooth' });
+            document.getElementById('app-grid').scrollTo({ left: (activeIdx - 1) * 290 - 100, behavior: 'smooth' });
         }
 
         function openApp() {
-            const vId = videoData[activeIdx];
             document.getElementById('video-overlay').style.display = 'block';
-            if (player && player.loadVideoById) {
-                player.loadVideoById(vId);
-            }
+            player.loadVideoById(videoData[activeIdx]);
+            isPlaying = true;
         }
 
         function closeApp() {
             document.getElementById('video-overlay').style.display = 'none';
-            if (player && player.stopVideo) player.stopVideo();
+            player.stopVideo();
+            isPlaying = false;
         }
 
-        function selectAndOpen(idx) { activeIdx = idx; updateUI(); setTimeout(openApp, 100); }
-
-        // Keyboard Fallback
-        document.addEventListener('keydown', (e) => {
-            if (e.key === "ArrowRight") navigate(1);
-            if (e.key === "ArrowLeft") navigate(-1);
-            if (e.key === "Enter") openApp();
-            if (e.key === "Backspace") closeApp();
-        });
-
-        setInterval(() => {
-            document.getElementById('time').innerText = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-        }, 1000);
+        setInterval(() => { document.getElementById('time').innerText = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}); }, 1000);
     </script>
 </body>
 </html>
