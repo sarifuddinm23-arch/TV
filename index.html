@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gemini OS | Premium OTT</title>
+    <title>Gemini OS | Keyboard & Remote Ready</title>
     <style>
         :root {
             --bg-color: #050505;
@@ -21,8 +21,7 @@
         }
 
         .bg-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: radial-gradient(circle at 20% 30%, #1a1a1a 0%, #050505 100%);
             z-index: -1;
         }
@@ -44,7 +43,6 @@
         .greeting { font-size: 1.2rem; opacity: 0.6; margin-bottom: 5px; }
         .featured-title { font-size: 2.5rem; margin-bottom: 30px; font-weight: bold; }
 
-        /* App Grid */
         .app-grid {
             display: flex; gap: 30px;
             overflow-x: hidden; padding: 20px 0;
@@ -53,58 +51,37 @@
 
         .app-card {
             min-width: 220px; height: 140px;
-            position: relative;
-            background: #1c1c1e;
-            border-radius: 15px;
-            overflow: hidden;
+            position: relative; background: #1c1c1e;
+            border-radius: 15px; overflow: hidden;
             border: 4px solid transparent;
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            flex-shrink: 0;
-            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0; display: flex; align-items: center; justify-content: center;
         }
 
         .app-card.active {
             transform: scale(1.15);
             border-color: var(--card-hover);
-            box-shadow: 0 15px 40px rgba(255,255,255,0.1);
+            box-shadow: 0 15px 40px rgba(255,255,255,0.15);
             background: #2c2c2e;
         }
 
         .app-logo {
-            width: 70%; height: auto;
-            max-height: 80%;
-            object-fit: contain;
-            transition: 0.3s;
-            filter: grayscale(20%);
+            width: 70%; height: auto; max-height: 80%;
+            object-fit: contain; filter: grayscale(20%);
         }
 
-        .app-card.active .app-logo {
-            filter: grayscale(0%);
-            transform: scale(1.1);
-        }
+        .app-card.active .app-logo { filter: grayscale(0%); transform: scale(1.1); }
 
-        /* Video Player Overlay */
         #video-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: #000;
-            display: none;
-            z-index: 1000;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000; display: none; z-index: 1000;
         }
 
         .back-hint {
             position: absolute; top: 20px; left: 20px;
-            background: rgba(0,0,0,0.6);
-            padding: 10px 20px; border-radius: 50px;
-            z-index: 1001; font-size: 14px;
+            background: rgba(0,0,0,0.6); padding: 10px 20px;
+            border-radius: 50px; z-index: 1001; font-size: 14px;
             border: 1px solid rgba(255,255,255,0.2);
-        }
-
-        /* Loading Animation */
-        .loader {
-            position: absolute; top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            display: none;
         }
     </style>
 </head>
@@ -119,7 +96,7 @@
 
     <div class="content">
         <div class="greeting" id="greeting-text">Welcome</div>
-        <div class="featured-title">Featured Apps</div>
+        <div class="featured-title">OTT Hub</div>
 
         <div class="app-grid" id="app-grid">
             <div class="app-card active" id="card-1">
@@ -132,7 +109,7 @@
                 <img class="app-logo" src="https://upload.wikimedia.org/wikipedia/commons/3/3e/Disney%2B_Hotstar_logo.svg" alt="Hotstar">
             </div>
             <div class="app-card" id="card-4">
-                <img class="app-logo" src="https://vignette.wikia.nocookie.net/logopedia/images/b/b3/MX_Player_Logo.png" alt="MX Player">
+                <img class="app-logo" src="https://upload.wikimedia.org/wikipedia/commons/b/b3/MX_Player_logo_%282019%29.png" alt="MX Player">
             </div>
             <div class="app-card" id="card-5">
                 <img class="app-logo" src="https://upload.wikimedia.org/wikipedia/commons/5/5a/Zee5_logo.svg" alt="Zee5">
@@ -150,7 +127,7 @@
     </div>
 
     <div id="video-overlay">
-        <div class="back-hint">Press BACK to exit</div>
+        <div class="back-hint">Press BACKSPACE or ESC to exit</div>
         <div id="yt-player"></div>
     </div>
 
@@ -159,26 +136,29 @@
         let player;
         let activeIdx = 1;
         const totalCards = 8;
-        
-        // YouTube video links for each app
         const videoData = {
-            'card-1': 'jfKfPfyJRdk', // YouTube
-            'card-2': '3JZ_D3ELwOQ', // Netflix
-            'card-3': 'I2mU-C4Ighw', // Hotstar
-            'card-4': 'dQw4w9WgXcQ', // MX Player
-            'card-5': '5qap5aO4i9A', // Zee5
-            'card-6': 'M7lc1UVf-VE', // SonyLIV
-            'card-7': '98WtmW-ljcE', // JioCinema
-            'card-8': 'K4TOrB7at0Y'  // Prime
+            'card-1': 'jfKfPfyJRdk', 'card-2': '3JZ_D3ELwOQ',
+            'card-3': 'I2mU-C4Ighw', 'card-4': 'dQw4w9WgXcQ',
+            'card-5': '5qap5aO4i9A', 'card-6': 'M7lc1UVf-VE',
+            'card-7': '98WtmW-ljcE', 'card-8': 'K4TOrB7at0Y'
         };
 
         function onYouTubeIframeAPIReady() {
             player = new YT.Player('yt-player', {
                 height: '100%', width: '100%',
-                playerVars: { 'autoplay': 1, 'controls': 1, 'rel': 0 }
+                playerVars: { 'autoplay': 1, 'controls': 1 }
             });
         }
 
+        // --- Keyboard Controls ---
+        document.addEventListener('keydown', (e) => {
+            if (e.key === "ArrowRight") navigate(1);
+            if (e.key === "ArrowLeft") navigate(-1);
+            if (e.key === "Enter") openApp();
+            if (e.key === "Backspace" || e.key === "Escape") closeApp();
+        });
+
+        // --- Remote/Storage Controls ---
         window.addEventListener('storage', (e) => {
             if (e.key === 'tv_command') {
                 const cmd = e.newValue;
@@ -187,10 +167,6 @@
                 if (cmd === 'Left') navigate(-1);
                 if (cmd === 'Enter') openApp();
                 if (cmd === 'Back' || cmd === 'Home') closeApp();
-                
-                // Hotkeys
-                if (cmd === 'Netflix') { activeIdx = 2; updateUI(); openApp(); }
-                if (cmd === 'YouTube') { activeIdx = 1; updateUI(); openApp(); }
             }
         });
 
@@ -205,7 +181,6 @@
             document.querySelectorAll('.app-card').forEach(card => card.classList.remove('active'));
             document.getElementById('card-' + activeIdx).classList.add('active');
             
-            // Center the active card
             const grid = document.getElementById('app-grid');
             const scrollPos = (activeIdx - 1) * 250; 
             grid.scrollTo({ left: scrollPos, behavior: 'smooth' });
@@ -225,11 +200,6 @@
         function updateClock() {
             const now = new Date();
             document.getElementById('time').innerText = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-            const hrs = now.getHours();
-            let g = "Good Evening";
-            if (hrs < 12) g = "Good Morning";
-            else if (hrs < 17) g = "Good Afternoon";
-            document.getElementById('greeting-text').innerText = g;
         }
         setInterval(updateClock, 1000);
         updateClock();
