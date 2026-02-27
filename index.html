@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gemini OS | Premium OTT Experience</title>
+    <title>Gemini OS | Premium OTT</title>
     <style>
         :root {
             --bg-color: #050505;
@@ -13,10 +13,7 @@
         }
 
         body, html {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
+            margin: 0; padding: 0; width: 100%; height: 100%;
             background-color: var(--bg-color);
             color: var(--text-main);
             font-family: 'Roboto', 'Segoe UI', sans-serif;
@@ -31,19 +28,14 @@
         }
 
         .navbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            display: flex; justify-content: space-between; align-items: center;
             padding: 30px 60px;
         }
 
         .logo {
-            font-size: 28px;
-            font-weight: 800;
-            letter-spacing: 1px;
+            font-size: 28px; font-weight: 800;
             background: linear-gradient(to right, #4285f4, #9b51e0);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
 
         .clock { font-size: 24px; opacity: 0.8; }
@@ -52,54 +44,46 @@
         .greeting { font-size: 1.2rem; opacity: 0.6; margin-bottom: 5px; }
         .featured-title { font-size: 2.5rem; margin-bottom: 30px; font-weight: bold; }
 
-        /* App Grid with Scroll */
+        /* App Grid */
         .app-grid {
-            display: flex;
-            gap: 25px;
-            overflow-x: hidden;
-            padding: 20px 0;
+            display: flex; gap: 30px;
+            overflow-x: hidden; padding: 20px 0;
             transition: all 0.5s ease;
         }
 
         .app-card {
-            min-width: 260px;
-            height: 150px;
+            min-width: 220px; height: 140px;
             position: relative;
             background: #1c1c1e;
-            border-radius: 12px;
+            border-radius: 15px;
             overflow: hidden;
             border: 4px solid transparent;
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
         }
 
         .app-card.active {
             transform: scale(1.15);
             border-color: var(--card-hover);
-            box-shadow: 0 15px 30px rgba(0,0,0,0.8);
-            z-index: 10;
+            box-shadow: 0 15px 40px rgba(255,255,255,0.1);
+            background: #2c2c2e;
         }
 
-        .card-img {
-            width: 100%;
-            height: 100%;
-            background-size: cover;
-            background-position: center;
-            opacity: 0.6;
+        .app-logo {
+            width: 70%; height: auto;
+            max-height: 80%;
+            object-fit: contain;
+            transition: 0.3s;
+            filter: grayscale(20%);
         }
 
-        .app-card.active .card-img { opacity: 1; }
-
-        .card-label {
-            position: absolute;
-            bottom: 12px;
-            left: 15px;
-            font-size: 16px;
-            font-weight: bold;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.9);
+        .app-card.active .app-logo {
+            filter: grayscale(0%);
+            transform: scale(1.1);
         }
 
-        /* Video Layer */
+        /* Video Player Overlay */
         #video-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -109,13 +93,18 @@
         }
 
         .back-hint {
-            position: absolute;
-            top: 20px; left: 20px;
+            position: absolute; top: 20px; left: 20px;
             background: rgba(0,0,0,0.6);
-            padding: 8px 15px;
-            border-radius: 5px;
-            z-index: 1001;
-            font-size: 14px;
+            padding: 10px 20px; border-radius: 50px;
+            z-index: 1001; font-size: 14px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        /* Loading Animation */
+        .loader {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            display: none;
         }
     </style>
 </head>
@@ -130,46 +119,38 @@
 
     <div class="content">
         <div class="greeting" id="greeting-text">Welcome</div>
-        <div class="featured-title">Indian OTT & Entertainment</div>
+        <div class="featured-title">Featured Apps</div>
 
         <div class="app-grid" id="app-grid">
             <div class="app-card active" id="card-1">
-                <div class="card-img" style="background-image: url('https://img.youtube.com/vi/jfKfPfyJRdk/maxresdefault.jpg');"></div>
-                <div class="card-label">YouTube</div>
+                <img class="app-logo" src="https://upload.wikimedia.org/wikipedia/commons/e/ef/Youtube_logo.png" alt="YouTube">
             </div>
             <div class="app-card" id="card-2">
-                <div class="card-img" style="background-image: url('https://img.youtube.com/vi/3JZ_D3ELwOQ/maxresdefault.jpg');"></div>
-                <div class="card-label">Netflix</div>
+                <img class="app-logo" src="https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg" alt="Netflix">
             </div>
             <div class="app-card" id="card-3">
-                <div class="card-img" style="background-image: url('https://img.youtube.com/vi/I2mU-C4Ighw/maxresdefault.jpg');"></div>
-                <div class="card-label">Disney+ Hotstar</div>
+                <img class="app-logo" src="https://upload.wikimedia.org/wikipedia/commons/3/3e/Disney%2B_Hotstar_logo.svg" alt="Hotstar">
             </div>
             <div class="app-card" id="card-4">
-                <div class="card-img" style="background-image: url('https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg');"></div>
-                <div class="card-label">MX Player</div>
+                <img class="app-logo" src="https://vignette.wikia.nocookie.net/logopedia/images/b/b3/MX_Player_Logo.png" alt="MX Player">
             </div>
             <div class="app-card" id="card-5">
-                <div class="card-img" style="background-image: url('https://img.youtube.com/vi/5qap5aO4i9A/maxresdefault.jpg');"></div>
-                <div class="card-label">Zee5</div>
+                <img class="app-logo" src="https://upload.wikimedia.org/wikipedia/commons/5/5a/Zee5_logo.svg" alt="Zee5">
             </div>
             <div class="app-card" id="card-6">
-                <div class="card-img" style="background-image: url('https://img.youtube.com/vi/M7lc1UVf-VE/maxresdefault.jpg');"></div>
-                <div class="card-label">SonyLIV</div>
+                <img class="app-logo" src="https://upload.wikimedia.org/wikipedia/commons/c/c5/SonyLIV_logo.svg" alt="SonyLIV">
             </div>
             <div class="app-card" id="card-7">
-                <div class="card-img" style="background-image: url('https://img.youtube.com/vi/98WtmW-ljcE/maxresdefault.jpg');"></div>
-                <div class="card-label">JioCinema</div>
+                <img class="app-logo" src="https://upload.wikimedia.org/wikipedia/commons/b/bf/JioCinema_Logo.svg" alt="JioCinema">
             </div>
             <div class="app-card" id="card-8">
-                <div class="card-img" style="background-image: url('https://img.youtube.com/vi/K4TOrB7at0Y/maxresdefault.jpg');"></div>
-                <div class="card-label">Prime Video</div>
+                <img class="app-logo" src="https://upload.wikimedia.org/wikipedia/commons/1/11/Amazon_Prime_Video_logo.svg" alt="Prime">
             </div>
         </div>
     </div>
 
     <div id="video-overlay">
-        <div class="back-hint">Press BACK to Home</div>
+        <div class="back-hint">Press BACK to exit</div>
         <div id="yt-player"></div>
     </div>
 
@@ -179,16 +160,16 @@
         let activeIdx = 1;
         const totalCards = 8;
         
-        // Video IDs for different apps
+        // YouTube video links for each app
         const videoData = {
-            'card-1': 'jfKfPfyJRdk', // YouTube Lofi
-            'card-2': '3JZ_D3ELwOQ', // Netflix Trailer
-            'card-3': 'I2mU-C4Ighw', // Hotstar Special
-            'card-4': 'dQw4w9WgXcQ', // MX Player Song
-            'card-5': '5qap5aO4i9A', // Zee5 Show
+            'card-1': 'jfKfPfyJRdk', // YouTube
+            'card-2': '3JZ_D3ELwOQ', // Netflix
+            'card-3': 'I2mU-C4Ighw', // Hotstar
+            'card-4': 'dQw4w9WgXcQ', // MX Player
+            'card-5': '5qap5aO4i9A', // Zee5
             'card-6': 'M7lc1UVf-VE', // SonyLIV
             'card-7': '98WtmW-ljcE', // JioCinema
-            'card-8': 'K4TOrB7at0Y'  // Prime Video
+            'card-8': 'K4TOrB7at0Y'  // Prime
         };
 
         function onYouTubeIframeAPIReady() {
@@ -207,7 +188,7 @@
                 if (cmd === 'Enter') openApp();
                 if (cmd === 'Back' || cmd === 'Home') closeApp();
                 
-                // Direct Shortcut Keys from Remote
+                // Hotkeys
                 if (cmd === 'Netflix') { activeIdx = 2; updateUI(); openApp(); }
                 if (cmd === 'YouTube') { activeIdx = 1; updateUI(); openApp(); }
             }
@@ -222,12 +203,11 @@
 
         function updateUI() {
             document.querySelectorAll('.app-card').forEach(card => card.classList.remove('active'));
-            const activeCard = document.getElementById('card-' + activeIdx);
-            activeCard.classList.add('active');
+            document.getElementById('card-' + activeIdx).classList.add('active');
             
-            // Auto-scroll logic
+            // Center the active card
             const grid = document.getElementById('app-grid');
-            const scrollPos = (activeIdx - 1) * 285; // Card width + gap
+            const scrollPos = (activeIdx - 1) * 250; 
             grid.scrollTo({ left: scrollPos, behavior: 'smooth' });
         }
 
@@ -245,11 +225,11 @@
         function updateClock() {
             const now = new Date();
             document.getElementById('time').innerText = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-            const hours = now.getHours();
-            let greet = "Good Evening";
-            if (hours < 12) greet = "Good Morning";
-            else if (hours < 17) greet = "Good Afternoon";
-            document.getElementById('greeting-text').innerText = greet;
+            const hrs = now.getHours();
+            let g = "Good Evening";
+            if (hrs < 12) g = "Good Morning";
+            else if (hrs < 17) g = "Good Afternoon";
+            document.getElementById('greeting-text').innerText = g;
         }
         setInterval(updateClock, 1000);
         updateClock();
