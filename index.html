@@ -3,51 +3,133 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gemini OS | TV Fix</title>
+    <title>Gemini OS | Android TV Interface</title>
     <style>
         :root {
-            --bg: #050505;
+            --bg: #0a0a0b;
             --accent: #4285f4;
+            --glass: rgba(255, 255, 255, 0.1);
+            --font-main: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
         }
 
         body, html {
             margin: 0; padding: 0; width: 100%; height: 100%;
             background-color: var(--bg);
-            color: white; font-family: 'Segoe UI', Roboto, sans-serif;
+            color: white; font-family: var(--font-main);
             overflow: hidden;
         }
 
-        /* App Grid Layout */
-        .app-grid { display: flex; gap: 20px; padding: 50px; }
-        .app-card { 
-            width: 220px; height: 130px; background: #1c1c1e; 
-            border-radius: 15px; display: flex; align-items: center; 
-            justify-content: center; border: 4px solid transparent; cursor: pointer; 
+        /* Ultra HD Wallpaper Background */
+        .wallpaper {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.4), rgba(10,10,11,1)), 
+                        url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1964&auto=format&fit=crop'); 
+            background-size: cover;
+            background-position: center;
+            z-index: -1;
+            transition: transform 1s ease;
         }
-        .app-card.active { border-color: white; transform: scale(1.05); transition: 0.3s; }
 
-        /* Video Overlay Fix */
+        /* Top Navigation */
+        .nav-bar {
+            display: flex; align-items: center; padding: 40px 60px;
+            gap: 30px; font-weight: 500; font-size: 18px; opacity: 0.7;
+        }
+        .nav-item.active { opacity: 1; border-bottom: 3px solid white; padding-bottom: 5px; }
+
+        /* Main Container */
+        .container { padding: 0 60px; margin-top: 20px; }
+
+        .hero-section { margin-bottom: 40px; }
+        .hero-title { font-size: 48px; font-weight: bold; margin: 0; }
+        .hero-subtitle { font-size: 20px; opacity: 0.8; margin-top: 10px; }
+
+        /* App Grid Layout (Google TV Style) */
+        .app-row-title { font-size: 22px; margin-bottom: 20px; font-weight: 500; opacity: 0.9; }
+        
+        .app-grid { 
+            display: flex; gap: 25px; padding: 10px 0;
+            overflow-x: visible;
+        }
+
+        .app-card { 
+            width: 200px; height: 110px; 
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border-radius: 12px; 
+            display: flex; align-items: center; 
+            justify-content: center; 
+            border: 2px solid transparent; 
+            cursor: pointer; 
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            position: relative;
+        }
+
+        .app-card img { width: 60%; filter: grayscale(0.3); transition: 0.3s; }
+
+        /* Focus / Hover State */
+        .app-card.active { 
+            transform: scale(1.15); 
+            background: white;
+            border-color: white;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            z-index: 10;
+        }
+        .app-card.active img { filter: grayscale(0); }
+
+        /* Video Overlay */
         #video-overlay {
             position: fixed; top: 0; left: 0;
             width: 100vw; height: 100vh;
             background: #000;
-            display: none; /* শুরুতে লুকানো থাকবে */
+            display: none;
             z-index: 9999;
         }
 
-        /* এটি নিশ্চিত করে যে ইউটিউব প্লেয়ার পুরো স্ক্রিন জুড়ে থাকবে */
-        #yt-player {
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
+        #yt-player { width: 100%; height: 100%; border: none; }
+
+        /* Time & Profile */
+        .top-right { position: absolute; top: 40px; right: 60px; display: flex; align-items: center; gap: 20px; }
+        .profile-pic { width: 40px; height: 40px; border-radius: 50%; background: var(--accent); }
     </style>
 </head>
 <body>
 
-    <div class="app-grid">
-        <div class="app-card active" id="card-1" onclick="GeminiOS.loadVideo('jfKfPfyJRdk')">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/e/ef/Youtube_logo.png" width="120">
+    <div class="wallpaper" id="bg-wp"></div>
+
+    <div class="top-right">
+        <div id="clock" style="font-size: 20px; font-weight: 500;">12:00 PM</div>
+        <div class="profile-pic"></div>
+    </div>
+
+    <div class="nav-bar">
+        <div class="nav-item">Search</div>
+        <div class="nav-item active">Home</div>
+        <div class="nav-item">Apps</div>
+        <div class="nav-item">Library</div>
+    </div>
+
+    <div class="container">
+        <div class="hero-section">
+            <p style="color: var(--accent); font-weight: bold; margin-bottom: 5px;">Featured</p>
+            <h1 class="hero-title">Welcome to Gemini OS</h1>
+            <p class="hero-subtitle">Your personalized entertainment hub.</p>
+        </div>
+
+        <div class="app-row-title">Your Apps</div>
+        <div class="app-grid">
+            <div class="app-card active" id="card-1" onclick="GeminiOS.loadVideo('jfKfPfyJRdk')">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/e/ef/Youtube_logo.png">
+            </div>
+            <div class="app-card" id="card-2" onclick="GeminiOS.loadVideo('3JZ_D3ELwOQ')">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg">
+            </div>
+            <div class="app-card" id="card-3" onclick="GeminiOS.loadVideo('I2mU-C4Ighw')">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/3/3e/Disney%2B_Hotstar_logo.svg">
+            </div>
+            <div class="app-card" id="card-4" onclick="GeminiOS.loadVideo('dQw4w9WgXcQ')">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/1/11/Amazon_Prime_Video_logo.svg">
+            </div>
         </div>
     </div>
 
@@ -59,20 +141,49 @@
     <script src="gemini-os.js"></script>
 
     <script>
-        // ইউটিউব এপিআই রেডি হলে কল হবে
         function onYouTubeIframeAPIReady() {
             if (window.GeminiOS) {
                 GeminiOS.initPlayer('yt-player');
-                console.log("Player Initialized");
             }
         }
 
-        // কিবোর্ড কন্ট্রোল টেস্ট
+        // Clock Function
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('clock').innerText = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // Keyboard Navigation Support
+        let currentFocus = 1;
+        const totalApps = 4;
+
         document.addEventListener('keydown', (e) => {
-            GeminiOS.executeCommand(e.key);
+            if(document.getElementById('video-overlay').style.display === 'block') {
+                GeminiOS.executeCommand(e.key);
+                return;
+            }
+
+            if(e.key === "ArrowRight" && currentFocus < totalApps) {
+                currentFocus++;
+                updateFocus();
+            } else if(e.key === "ArrowLeft" && currentFocus > 1) {
+                currentFocus--;
+                updateFocus();
+            } else if(e.key === "Enter") {
+                document.getElementById(`card-${currentFocus}`).click();
+            }
         });
 
-        // একই ব্রাউজারে রিমোট টেস্ট করার জন্য
+        function updateFocus() {
+            document.querySelectorAll('.app-card').forEach(card => card.classList.remove('active'));
+            document.getElementById(`card-${currentFocus}`).classList.add('active');
+            
+            // Background shift effect
+            document.getElementById('bg-wp').style.transform = `scale(1.05) translateX(-${(currentFocus-1) * 20}px)`;
+        }
+
         window.addEventListener('storage', (e) => {
             if (e.key === 'gemini_cmd' && e.newValue) {
                 GeminiOS.executeCommand(e.newValue);
