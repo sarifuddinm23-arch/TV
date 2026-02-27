@@ -2,33 +2,99 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Smart TV Interface</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart TV - YouTube Edition</title>
     <style>
-        body { background: #111; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; font-family: sans-serif; }
-        #screen { width: 80%; height: 60%; border: 10px solid #333; border-radius: 20px; display: flex; justify-content: center; align-items: center; font-size: 3rem; background: black; box-shadow: 0 0 50px rgba(0,0,0,0.5); }
-        .channel-info { text-align: center; }
+        body { 
+            background: #000; 
+            margin: 0; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            overflow: hidden;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        #tv-frame {
+            width: 90%;
+            height: 80%;
+            border: 15px solid #222;
+            border-radius: 20px;
+            background: #111;
+            position: relative;
+            box-shadow: 0 0 100px rgba(0,0,0,0.8);
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            border-radius: 5px;
+        }
+        .overlay {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0,0,0,0.7);
+            padding: 10px 20px;
+            color: white;
+            border-radius: 5px;
+            display: none; /* কমান্ড পাওয়ার সময় দেখাবে */
+        }
     </style>
 </head>
 <body>
 
-    <div id="screen">
-        <div class="channel-info" id="display">TV OFF</div>
+    <div id="tv-frame">
+        <div id="player"></div> <div id="status" class="overlay">Loading...</div>
     </div>
 
     <script>
-        // রিমোটের কমান্ড শোনার জন্য ইভেন্ট লিসেনার
+        // ইউটিউব প্লেয়ার API লোড করা
+        var tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        var firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+        var player;
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('player', {
+                height: '100%',
+                width: '100%',
+                videoId: 'dQw4w9WgXcQ', // ডিফল্ট ভিডিও ID
+                playerVars: { 'autoplay': 1, 'controls': 1 },
+                events: { 'onReady': onPlayerReady }
+            });
+        }
+
+        function onPlayerReady(event) {
+            console.log("TV is Ready!");
+        }
+
+        // রিমোট থেকে কমান্ড শোনা
         window.addEventListener('storage', (e) => {
-            if (e.key === 'tv_command') {
-                const command = e.newValue;
-                const display = document.getElementById('display');
-                
-                if (command === 'power') {
-                    display.innerText = display.innerText === "TV OFF" ? "WELCOME" : "TV OFF";
-                } else {
-                    display.innerText = "Playing: " + command;
+            if (e.key === 'tv_command' && e.newValue) {
+                const cmd = e.newValue;
+                showStatus(cmd);
+
+                if (cmd === 'Netflix') {
+                    player.loadVideoById('dQw4w9WgXcQ'); // উদাহরণ ভিডিও ১
+                } else if (cmd === 'YouTube') {
+                    player.loadVideoById('3JZ_D3ELwOQ'); // উদাহরণ ভিডিও ২
+                } else if (cmd === 'Channel 1') {
+                    player.loadVideoById('jfKfPfyJRdk'); // লো-ফাই বা লাইভ মিউজিক
+                } else if (cmd === 'power') {
+                    const state = player.getPlayerState();
+                    state === 1 ? player.pauseVideo() : player.playVideo();
                 }
             }
         });
+
+        function showStatus(text) {
+            const status = document.getElementById('status');
+            status.innerText = "Action: " + text;
+            status.style.display = 'block';
+            setTimeout(() => { status.style.display = 'none'; }, 3000);
+        }
     </script>
 </body>
 </html>
