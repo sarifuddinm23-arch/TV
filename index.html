@@ -2,76 +2,237 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Gemini OS - Android TV</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gemini OS | Smart TV Experience</title>
     <style>
-        body { background: #000; color: white; font-family: sans-serif; margin: 0; padding: 20px; overflow: hidden; }
-        .header { display: flex; justify-content: space-between; font-size: 1.2rem; margin-bottom: 20px; }
-        .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
-        .card { 
-            background: #1c1c1e; padding: 10px; border-radius: 12px; 
-            border: 3px solid transparent; transition: 0.3s; text-align: center;
+        :root {
+            --bg-color: #050505;
+            --accent-color: #4285f4;
+            --card-hover: #ffffff;
+            --text-main: #ffffff;
         }
-        .card.active { border-color: #4285f4; transform: scale(1.05); }
-        .thumb { height: 120px; background: #333; border-radius: 8px; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; font-weight: bold; }
-        #player-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; display: none; }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Roboto', 'Segoe UI', sans-serif;
+            overflow: hidden;
+        }
+
+        /* Background Gradient Overlay */
+        .bg-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at 20% 30%, #1a1a1a 0%, #050505 100%);
+            z-index: -1;
+        }
+
+        /* Top Bar */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 40px 60px;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            background: linear-gradient(to right, #4285f4, #9b51e0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .clock { font-size: 24px; opacity: 0.8; }
+
+        /* Content Area */
+        .content {
+            padding: 0 60px;
+        }
+
+        .greeting { font-size: 1.5rem; opacity: 0.6; margin-bottom: 10px; }
+        .featured-title { font-size: 3rem; margin-bottom: 40px; font-weight: bold; }
+
+        /* App Grid */
+        .app-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 25px;
+        }
+
+        .app-card {
+            position: relative;
+            background: #1c1c1e;
+            border-radius: 15px;
+            height: 180px;
+            overflow: hidden;
+            border: 4px solid transparent;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+        }
+
+        .app-card.active {
+            transform: scale(1.1);
+            border-color: var(--card-hover);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+            z-index: 10;
+        }
+
+        .card-img {
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            opacity: 0.7;
+            transition: 0.3s;
+        }
+
+        .app-card.active .card-img { opacity: 1; }
+
+        .card-label {
+            position: absolute;
+            bottom: 15px;
+            left: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+        }
+
+        /* Fullscreen Player Layer */
+        #video-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: #000;
+            display: none;
+            z-index: 1000;
+        }
+
+        .back-hint {
+            position: absolute;
+            top: 20px; left: 20px;
+            background: rgba(0,0,0,0.5);
+            padding: 10px;
+            border-radius: 5px;
+            z-index: 1001;
+        }
     </style>
 </head>
 <body>
-    <div class="header">
-        <span>Gemini OS</span>
-        <span id="clock">12:00</span>
+
+    <div class="bg-overlay"></div>
+
+    <div class="navbar">
+        <div class="logo">GEMINI OS</div>
+        <div class="clock" id="time">12:45 PM</div>
     </div>
 
-    <div class="grid">
-        <div class="card active" id="c1"><div class="thumb" style="background:red">YouTube</div>Live TV</div>
-        <div class="card" id="c2"><div class="thumb" style="background:blue">Movies</div>Action</div>
-        <div class="card" id="c3"><div class="thumb" style="background:green">Music</div>Songs</div>
-        <div class="card" id="c4"><div class="thumb" style="background:purple">Apps</div>Settings</div>
+    <div class="content">
+        <div class="greeting" id="greeting-text">Good Evening</div>
+        <div class="featured-title">What would you like to watch?</div>
+
+        <div class="app-grid">
+            <div class="app-card active" id="card-1">
+                <div class="card-img" style="background-image: url('https://img.youtube.com/vi/jfKfPfyJRdk/maxresdefault.jpg');"></div>
+                <div class="card-label">Lofi Music</div>
+            </div>
+            <div class="app-card" id="card-2">
+                <div class="card-img" style="background-image: url('https://img.youtube.com/vi/3JZ_D3ELwOQ/maxresdefault.jpg');"></div>
+                <div class="card-label">Movie Trailers</div>
+            </div>
+            <div class="app-card" id="card-3">
+                <div class="card-img" style="background-image: url('https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg');"></div>
+                <div class="card-label">YouTube Music</div>
+            </div>
+            <div class="app-card" id="card-4">
+                <div class="card-img" style="background-image: url('https://img.youtube.com/vi/5qap5aO4i9A/maxresdefault.jpg');"></div>
+                <div class="card-label">Tech Reviews</div>
+            </div>
+        </div>
     </div>
 
-    <div id="player-layer">
+    <div id="video-overlay">
+        <div class="back-hint">Press BACK to exit</div>
         <div id="yt-player"></div>
     </div>
 
     <script src="https://www.youtube.com/iframe_api"></script>
     <script>
         let player;
-        let selected = 1;
-        const videos = { 1: 'jfKfPfyJRdk', 2: '3JZ_D3ELwOQ', 3: 'dQw4w9WgXcQ', 4: '5qap5aO4i9A' };
+        let activeIdx = 1;
+        const totalCards = 4;
+        const videoData = {
+            'card-1': 'jfKfPfyJRdk',
+            'card-2': '3JZ_D3ELwOQ',
+            'card-3': 'dQw4w9WgXcQ',
+            'card-4': '5qap5aO4i9A'
+        };
 
+        // Initialize YouTube Player
         function onYouTubeIframeAPIReady() {
-            player = new YT.Player('yt-player', { height: '100%', width: '100%', playerVars: {'autoplay': 1} });
+            player = new YT.Player('yt-player', {
+                height: '100%',
+                width: '100%',
+                playerVars: { 'autoplay': 1, 'controls': 1, 'rel': 0 }
+            });
         }
 
+        // Listen for Remote Commands
         window.addEventListener('storage', (e) => {
             if (e.key === 'tv_command') {
                 const cmd = e.newValue;
-                if (cmd === 'Right') move(1);
-                if (cmd === 'Left') move(-1);
-                if (cmd === 'Enter') play();
-                if (cmd === 'Back' || cmd === 'Home') stop();
+                if (!cmd) return;
+
+                if (cmd === 'Right') navigate(1);
+                if (cmd === 'Left') navigate(-1);
+                if (cmd === 'Enter') openApp();
+                if (cmd === 'Back' || cmd === 'Home') closeApp();
+                if (cmd === 'Netflix') { activeIdx = 2; updateUI(); openApp(); }
+                if (cmd === 'YouTube') { activeIdx = 1; updateUI(); openApp(); }
             }
         });
 
-        function move(dir) {
-            document.getElementById('c'+selected).classList.remove('active');
-            selected += dir;
-            if (selected > 4) selected = 1;
-            if (selected < 1) selected = 4;
-            document.getElementById('c'+selected).classList.add('active');
+        function navigate(direction) {
+            activeIdx += direction;
+            if (activeIdx > totalCards) activeIdx = 1;
+            if (activeIdx < 1) activeIdx = totalCards;
+            updateUI();
         }
 
-        function play() {
-            document.getElementById('player-layer').style.display = 'block';
-            player.loadVideoById(videos[selected]);
+        function updateUI() {
+            document.querySelectorAll('.app-card').forEach(card => card.classList.remove('active'));
+            document.getElementById('card-' + activeIdx).classList.add('active');
         }
 
-        function stop() {
-            document.getElementById('player-layer').style.display = 'none';
+        function openApp() {
+            const videoId = videoData['card-' + activeIdx];
+            document.getElementById('video-overlay').style.display = 'block';
+            player.loadVideoById(videoId);
+        }
+
+        function closeApp() {
+            document.getElementById('video-overlay').style.display = 'none';
             player.stopVideo();
         }
 
-        setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}); }, 1000);
+        // Clock and Greeting
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('time').innerText = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            
+            const hours = now.getHours();
+            let greet = "Good Evening";
+            if (hours < 12) greet = "Good Morning";
+            else if (hours < 17) greet = "Good Afternoon";
+            document.getElementById('greeting-text').innerText = greet;
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
     </script>
 </body>
 </html>
