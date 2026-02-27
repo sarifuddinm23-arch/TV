@@ -2,165 +2,76 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gemini OS - Smart TV</title>
+    <title>Gemini OS - Android TV</title>
     <style>
-        :root {
-            --bg-color: #0a0a0a;
-            --accent-color: #4285f4;
-            --card-bg: #1c1c1e;
+        body { background: #000; color: white; font-family: sans-serif; margin: 0; padding: 20px; overflow: hidden; }
+        .header { display: flex; justify-content: space-between; font-size: 1.2rem; margin-bottom: 20px; }
+        .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+        .card { 
+            background: #1c1c1e; padding: 10px; border-radius: 12px; 
+            border: 3px solid transparent; transition: 0.3s; text-align: center;
         }
-
-        body {
-            background-color: var(--bg-color);
-            color: white;
-            font-family: 'Segoe UI', Roboto, sans-serif;
-            margin: 0;
-            padding: 40px;
-            overflow: hidden;
-        }
-
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-        }
-
-        .logo { font-size: 24px; font-weight: bold; color: var(--accent-color); }
-        .time { font-size: 20px; opacity: 0.8; }
-
-        .container {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
-        }
-
-        .card {
-            background: var(--card-bg);
-            border-radius: 15px;
-            overflow: hidden;
-            transition: transform 0.3s, border 0.3s;
-            border: 3px solid transparent;
-            cursor: pointer;
-        }
-
-        .card.active {
-            transform: scale(1.05);
-            border-color: white;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-
-        .thumbnail {
-            width: 100%;
-            height: 150px;
-            background: #333;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .info { padding: 15px; font-size: 16px; font-weight: 500; }
-
-        /* Video Overlay */
-        #video-player-container {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: black;
-            z-index: 100;
-        }
+        .card.active { border-color: #4285f4; transform: scale(1.05); }
+        .thumb { height: 120px; background: #333; border-radius: 8px; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+        #player-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; display: none; }
     </style>
 </head>
 <body>
-
-    <header>
-        <div class="logo">Gemini OS</div>
-        <div class="time" id="clock">12:00 PM</div>
-    </header>
-
-    <div class="container" id="app-grid">
-        <div class="card active" id="card-1">
-            <div class="thumbnail" style="background: linear-gradient(45deg, #ff0000, #b2071d);">YouTube</div>
-            <div class="info">YouTube Live</div>
-        </div>
-        <div class="card" id="card-2">
-            <div class="thumbnail" style="background: linear-gradient(45deg, #00d2ff, #3a7bd5);">Movies</div>
-            <div class="info">Blockbuster Movies</div>
-        </div>
-        <div class="card" id="card-3">
-            <div class="thumbnail" style="background: linear-gradient(45deg, #1d976c, #93f9b9);">Music</div>
-            <div class="info">Spotify Music</div>
-        </div>
-        <div class="card" id="card-4">
-            <div class="thumbnail" style="background: linear-gradient(45deg, #f093fb, #f5576c);">Apps</div>
-            <div class="info">Play Store</div>
-        </div>
+    <div class="header">
+        <span>Gemini OS</span>
+        <span id="clock">12:00</span>
     </div>
 
-    <div id="video-player-container">
-        <div id="player"></div>
-        <button onclick="closePlayer()" style="position:absolute; top:20px; right:20px; padding:10px; z-index:101; background:rgba(255,255,255,0.2); color:white; border:none; border-radius:5px; cursor:pointer;">Back to Home</button>
+    <div class="grid">
+        <div class="card active" id="c1"><div class="thumb" style="background:red">YouTube</div>Live TV</div>
+        <div class="card" id="c2"><div class="thumb" style="background:blue">Movies</div>Action</div>
+        <div class="card" id="c3"><div class="thumb" style="background:green">Music</div>Songs</div>
+        <div class="card" id="c4"><div class="thumb" style="background:purple">Apps</div>Settings</div>
+    </div>
+
+    <div id="player-layer">
+        <div id="yt-player"></div>
     </div>
 
     <script src="https://www.youtube.com/iframe_api"></script>
     <script>
         let player;
-        const videoList = {
-            'card-1': 'jfKfPfyJRdk', // Lofi Girl
-            'card-2': '3JZ_D3ELwOQ', // Movie Trailer
-            'card-3': 'dQw4w9WgXcQ', // Music
-            'card-4': '5qap5aO4i9A'  // Tech News
-        };
+        let selected = 1;
+        const videos = { 1: 'jfKfPfyJRdk', 2: '3JZ_D3ELwOQ', 3: 'dQw4w9WgXcQ', 4: '5qap5aO4i9A' };
 
         function onYouTubeIframeAPIReady() {
-            player = new YT.Player('player', {
-                height: '100%', width: '100%',
-                playerVars: { 'autoplay': 1, 'controls': 1 }
-            });
+            player = new YT.Player('yt-player', { height: '100%', width: '100%', playerVars: {'autoplay': 1} });
         }
 
-        function playVideo(id) {
-            const videoId = videoList[id];
-            document.getElementById('video-player-container').style.display = 'block';
-            player.loadVideoById(videoId);
-        }
-
-        function closePlayer() {
-            player.stopVideo();
-            document.getElementById('video-player-container').style.display = 'none';
-        }
-
-        // টাইম আপডেট
-        setInterval(() => {
-            document.getElementById('clock').innerText = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-        }, 1000);
-
-        // রিমোট কন্ট্রোল লজিক
-        let currentActive = 1;
         window.addEventListener('storage', (e) => {
             if (e.key === 'tv_command') {
                 const cmd = e.newValue;
-                
-                if (cmd === 'Right') {
-                    moveSelection(1);
-                } else if (cmd === 'Left') {
-                    moveSelection(-1);
-                } else if (cmd === 'Enter') {
-                    playVideo('card-' + currentActive);
-                } else if (cmd === 'Back') {
-                    closePlayer();
-                }
+                if (cmd === 'Right') move(1);
+                if (cmd === 'Left') move(-1);
+                if (cmd === 'Enter') play();
+                if (cmd === 'Back' || cmd === 'Home') stop();
             }
         });
 
-        function moveSelection(dir) {
-            document.getElementById('card-' + currentActive).classList.remove('active');
-            currentActive += dir;
-            if (currentActive > 4) currentActive = 1;
-            if (currentActive < 1) currentActive = 4;
-            document.getElementById('card-' + currentActive).classList.add('active');
+        function move(dir) {
+            document.getElementById('c'+selected).classList.remove('active');
+            selected += dir;
+            if (selected > 4) selected = 1;
+            if (selected < 1) selected = 4;
+            document.getElementById('c'+selected).classList.add('active');
         }
+
+        function play() {
+            document.getElementById('player-layer').style.display = 'block';
+            player.loadVideoById(videos[selected]);
+        }
+
+        function stop() {
+            document.getElementById('player-layer').style.display = 'none';
+            player.stopVideo();
+        }
+
+        setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}); }, 1000);
     </script>
 </body>
 </html>
